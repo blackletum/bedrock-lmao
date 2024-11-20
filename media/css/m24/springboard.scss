@@ -75,7 +75,7 @@ $springboard-thumb-width: 32px;
     width: 24px;
 }
 
-.m24-c-springboard-cat {
+.m24-c-springboard-topic {
     font-weight: bold;
     grid-area: cat;
     text-align: end;
@@ -158,7 +158,7 @@ $springboard-thumb-width: 32px;
         }
 
         .m24-c-springboard-author,
-        .m24-c-springboard-cat {
+        .m24-c-springboard-topic {
             text-align: start;
         }
     }
