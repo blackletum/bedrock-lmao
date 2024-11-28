@@ -50,7 +50,8 @@
 }
 
 .m24-c-gallery-tile-title {
-    font-size: $text-title-md;
+    font-size: $text-title-sm;
+    margin-bottom: $spacer-2xs;
     order: 2;
     text-decoration: underline 0.075em transparent;
     transition: text-decoration-color $fast $bezier, color $fast $bezier;
@@ -66,8 +67,9 @@
 
     &:hover,
     &:focus,
-    &:active {
-        color: $m24-color-dark-green;
+    &:active,
+    &:visited:hover {
+        color: inherit;
         text-decoration: underline;
     }
 
@@ -111,7 +113,7 @@
     color: $m24-color-black;
     display: flex;
     font-size: 14px; // fixed size
-    font-weight: bold;
+    font-weight: 600;
     height: 32px;
     order: 3;
     padding: 0 8px;
@@ -140,7 +142,7 @@
     align-items: center;
     display: flex;
     font-size: $text-button-sm;
-    font-weight: bold;
+    font-weight: 600;
     min-height: 48px;
     text-decoration: underline;
 }
