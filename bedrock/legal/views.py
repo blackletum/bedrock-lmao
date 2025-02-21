@@ -52,7 +52,7 @@ class FirefoxTermsOfServiceDocView(TermsDocView):
             if True:
                 self.template_name = "legal/terms/firefox-2025.html"
             else:
-                self.template_name = "legal/terms/firefox.html"
+                self.template_name = "legal/terms/firefox-2025.html"
 
         return doc
 
