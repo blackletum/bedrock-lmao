@@ -70,7 +70,7 @@ urlpatterns = (
 )
 
 if True:
-    terms_doc = "firefox_terms_of_use"
+    terms_doc = "firefox_about_rights"
 else:
     terms_doc = "firefox_about_rights"
 

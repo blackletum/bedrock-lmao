@@ -11,12 +11,19 @@
 
 $mq-max: '(min-width: 1440px)';
 
+.c-back {
+    display: none;
+    padding-top: $layout-sm;
+    padding-bottom: 0;
 
-// Privacy Notice
+    @media #{$mq-md} {
+        display: block;
+    }
+}
 
 .c-legal {
     padding-bottom: $spacing-md;
-    padding-top: $spacing-md;
+    padding-top: $layout-md;
 
     .c-legal-heading {
         border-bottom: 1px solid $color-light-gray-30;
