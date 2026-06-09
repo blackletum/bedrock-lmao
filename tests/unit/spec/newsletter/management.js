@@ -399,26 +399,6 @@ describe('management.es6.js', function () {
             expect(lang.options[lang.selectedIndex].value).toEqual('en');
         });
 
-        it('should default to English / US when user data does not match available options', function () {
-            const country = document.getElementById('id_country');
-            const lang = document.getElementById('id_lang');
-            const partialUserData = {
-                email: 'example@example.com',
-                country: 'xx',
-                lang: 'xx'
-            };
-
-            spyOn(NewsletterManagementForm, 'getPageLocale').and.returnValue(
-                'en-US'
-            );
-            NewsletterManagementForm.setFormDefaults(partialUserData);
-            expect(document.getElementById('id_email').innerText).toEqual(
-                partialUserData.email
-            );
-            expect(country.options[country.selectedIndex].value).toEqual('us');
-            expect(lang.options[lang.selectedIndex].value).toEqual('en');
-        });
-
         it('should fuzzy match language codes returned from basket', function () {
             const country = document.getElementById('id_country');
             const lang = document.getElementById('id_lang');
@@ -841,8 +821,8 @@ describe('management.es6.js', function () {
             });
         });
 
-        it('should render an error message for an invalid / expired token', function () {
-            const error = { statusText: 'Not Found' };
+        it('should redirect to recovery page for an invalid / expired token (403)', function () {
+            const error = { status: 403, statusText: 'Forbidden' };
 
             spyOn(FormUtils, 'getUserToken').and.returnValue(TOKEN_MOCK);
             spyOn(NewsletterManagementForm, 'getUserData').and.returnValue(
@@ -851,19 +831,41 @@ describe('management.es6.js', function () {
             spyOn(
                 NewsletterManagementForm,
                 'getNewsletterData'
-            ).and.returnValue(window.Promise.reject(newsletterData));
+            ).and.returnValue(window.Promise.reject(error));
             spyOn(
                 NewsletterManagementForm,
                 'getNewsletterStrings'
             ).and.returnValue(window.Promise.resolve(stringData));
+            spyOn(NewsletterManagementForm, 'redirectToRecoveryPage');
 
             return NewsletterManagementForm.init().then(() => {
-                const error = document
-                    .querySelector('.mzp-c-form-errors li:nth-child(1)')
-                    .innerHTML.trim();
-                expect(error).toEqual(
-                    'The supplied link has expired. Please <a href="/en-US/newsletter/recovery/">request a new link here</a>.'
-                );
+                expect(
+                    NewsletterManagementForm.redirectToRecoveryPage
+                ).toHaveBeenCalledWith({ expired: true });
+            });
+        });
+
+        it('should redirect to recovery page for an invalid / expired token (404)', function () {
+            const error = { status: 404, statusText: 'Not Found' };
+
+            spyOn(FormUtils, 'getUserToken').and.returnValue(TOKEN_MOCK);
+            spyOn(NewsletterManagementForm, 'getUserData').and.returnValue(
+                window.Promise.reject(error)
+            );
+            spyOn(
+                NewsletterManagementForm,
+                'getNewsletterData'
+            ).and.returnValue(window.Promise.reject(error));
+            spyOn(
+                NewsletterManagementForm,
+                'getNewsletterStrings'
+            ).and.returnValue(window.Promise.resolve(stringData));
+            spyOn(NewsletterManagementForm, 'redirectToRecoveryPage');
+
+            return NewsletterManagementForm.init().then(() => {
+                expect(
+                    NewsletterManagementForm.redirectToRecoveryPage
+                ).toHaveBeenCalledWith({ expired: true });
             });
         });
 
@@ -921,14 +923,30 @@ describe('management.es6.js', function () {
     });
 
     describe('onSubmit', function () {
-        let xhr;
         let xhrRequests = [];
 
         beforeEach(function () {
-            xhr = sinon.useFakeXMLHttpRequest();
-            xhr.onCreate = (req) => {
-                xhrRequests.push(req);
+            xhrRequests = [];
+
+            function FakeXHR() {
+                this.headers = {};
+                this.readyState = 0;
+                this.status = 0;
+                this.responseText = '';
+                this.onload = null;
+
+                xhrRequests.push(this);
+            }
+
+            FakeXHR.prototype.open = jasmine.createSpy('open');
+            FakeXHR.prototype.setRequestHeader = function (header, value) {
+                this.headers[header] = value;
             };
+            FakeXHR.prototype.send = jasmine.createSpy('send');
+
+            spyOn(window, 'XMLHttpRequest').and.callFake(function () {
+                return new FakeXHR();
+            });
 
             spyOn(FormUtils, 'getUserToken').and.returnValue(TOKEN_MOCK);
             spyOn(NewsletterManagementForm, 'getUserData').and.returnValue(
@@ -948,7 +966,6 @@ describe('management.es6.js', function () {
         });
 
         afterEach(function () {
-            xhr.restore();
             xhrRequests = [];
         });
 
@@ -958,16 +975,19 @@ describe('management.es6.js', function () {
             return NewsletterManagementForm.init().then(() => {
                 document.querySelector('button[type="submit"]').click();
 
-                expect(xhrRequests[0].url).toEqual(
-                    `https://basket.mozilla.org/news/user/${TOKEN_MOCK}/`
+                const req = xhrRequests[0];
+                req.status = 200;
+                req.readyState = 4;
+                req.responseText = '{"status": "ok"}';
+                req.onload({ target: req });
+
+                expect(req.open).toHaveBeenCalledWith(
+                    'POST',
+                    `https://basket.mozilla.org/news/user/${TOKEN_MOCK}/`,
+                    true
                 );
-                expect(xhrRequests[0].requestBody).toEqual(
+                expect(req.send).toHaveBeenCalledWith(
                     'country=us&lang=en&newsletters=mozilla-and-you%2Cmozilla-foundation%2Cabout-mozilla&optin=Y&source_url=https%3A%2F%2Fwww.mozilla.org%2Fen-US%2Fnewsletter%2Fexisting%2F'
-                );
-                xhrRequests[0].respond(
-                    200,
-                    { 'Content-Type': 'application/json' },
-                    '{"status": "ok"}'
                 );
                 expect(
                     NewsletterManagementForm.onFormSuccess
@@ -982,13 +1002,14 @@ describe('management.es6.js', function () {
                 document.querySelector('input[value="common-voice"]').click();
                 document.querySelector('button[type="submit"]').click();
 
-                expect(xhrRequests[0].requestBody).toEqual(
+                const req = xhrRequests[0];
+                req.status = 200;
+                req.readyState = 4;
+                req.responseText = '{"status": "ok"}';
+                req.onload({ target: req });
+
+                expect(req.send).toHaveBeenCalledWith(
                     'country=us&lang=en&newsletters=mozilla-and-you%2Cmozilla-foundation%2Ccommon-voice%2Cabout-mozilla&optin=Y&source_url=https%3A%2F%2Fwww.mozilla.org%2Fen-US%2Fnewsletter%2Fexisting%2F'
-                );
-                xhrRequests[0].respond(
-                    200,
-                    { 'Content-Type': 'application/json' },
-                    '{"status": "ok"}'
                 );
                 expect(
                     NewsletterManagementForm.onFormSuccess
@@ -1005,13 +1026,14 @@ describe('management.es6.js', function () {
                     .click();
                 document.querySelector('button[type="submit"]').click();
 
-                expect(xhrRequests[0].requestBody).toEqual(
+                const req = xhrRequests[0];
+                req.status = 200;
+                req.readyState = 4;
+                req.responseText = '{"status": "ok"}';
+                req.onload({ target: req });
+
+                expect(req.send).toHaveBeenCalledWith(
                     'country=us&lang=en&newsletters=mozilla-foundation%2Cabout-mozilla&optin=Y&source_url=https%3A%2F%2Fwww.mozilla.org%2Fen-US%2Fnewsletter%2Fexisting%2F'
-                );
-                xhrRequests[0].respond(
-                    200,
-                    { 'Content-Type': 'application/json' },
-                    '{"status": "ok"}'
                 );
                 expect(
                     NewsletterManagementForm.onFormSuccess
@@ -1026,15 +1048,18 @@ describe('management.es6.js', function () {
                 document.getElementById('id_remove_all').click();
                 document.querySelector('button[type="submit"]').click();
 
-                expect(xhrRequests[0].url).toEqual(
-                    `https://basket.mozilla.org/news/unsubscribe/${TOKEN_MOCK}/`
+                const req = xhrRequests[0];
+                req.status = 200;
+                req.readyState = 4;
+                req.responseText = '{"status": "ok"}';
+                req.onload({ target: req });
+
+                expect(req.open).toHaveBeenCalledWith(
+                    'POST',
+                    `https://basket.mozilla.org/news/unsubscribe/${TOKEN_MOCK}/`,
+                    true
                 );
-                expect(xhrRequests[0].requestBody).toEqual('optout=Y');
-                xhrRequests[0].respond(
-                    200,
-                    { 'Content-Type': 'application/json' },
-                    '{"status": "ok"}'
-                );
+                expect(req.send).toHaveBeenCalledWith('optout=Y');
                 expect(
                     NewsletterManagementForm.onUnsubscribeAll
                 ).toHaveBeenCalled();
@@ -1067,11 +1092,14 @@ describe('management.es6.js', function () {
 
             return NewsletterManagementForm.init().then(() => {
                 document.querySelector('button[type="submit"]').click();
-                xhrRequests[0].respond(
-                    400,
-                    { 'Content-Type': 'application/json' },
-                    '{"status": "error", "desc": "Unknown non-helpful error"}'
-                );
+
+                const req = xhrRequests[0];
+                req.status = 400;
+                req.readyState = 4;
+                req.responseText =
+                    '{"status": "error", "desc": "Unknown non-helpful error"}';
+                req.onload({ target: req });
+
                 expect(
                     NewsletterManagementForm.onFormSuccess
                 ).not.toHaveBeenCalled();

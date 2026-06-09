@@ -26,11 +26,12 @@ def driver_log():
 def session_capabilities(pytestconfig, session_capabilities):
     driver = pytestconfig.getoption("driver")
     if driver == "SauceLabs":
-        session_capabilities.setdefault("tags", []).append("bedrock")
+        sauce_options = session_capabilities.setdefault("sauce:options", {})
+        sauce_options.setdefault("tags", []).append("bedrock")
 
         if session_capabilities.get("browserName", driver).lower() == "internet explorer":
             # Avoid default SauceLabs proxy for IE.
-            session_capabilities["avoidProxy"] = True
+            sauce_options["avoidProxy"] = True
 
             # Use JavaScript events instead of native
             # window events for more reliable IE testing.
@@ -93,6 +94,9 @@ def pytest_generate_tests(metafunc):
             urls = []
             doc = get_web_page(f"{base_url}/en-US/firefox/all/")
             product_urls = [a.attrib["href"] for a in doc("ul.c-product-list a")]
+            # FIXME: sanity checks after first scene is redirected to FXC:
+            if product_urls and product_urls[0].startswith("/en-US/download/all/"):
+                product_urls = ["/en-US/firefox/all/desktop-release/", "/en-US/firefox/all/desktop-esr/"]
             # If product url links outside of /firefox/all/ ignore it. (e.g. testflight)
             product_urls = [url for url in product_urls if url.startswith("/en-US/firefox/all/")]
             for url in product_urls:

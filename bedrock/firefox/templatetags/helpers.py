@@ -88,9 +88,9 @@ def desktop_builds(
     return builds
 
 
-def android_builds(channel, builds=None):
+def android_builds(channel, builds=None, utm_params=None):
     builds = builds or []
-    link = firefox_android.get_download_url(channel.lower())
+    link = firefox_android.get_download_url(channel.lower(), utm_params=utm_params)
     builds.append({"os": "android", "os_pretty": "Android", "download_link": link})
 
     return builds
@@ -151,7 +151,15 @@ def download_firefox(
 
     if show_android:
         version = firefox_android.latest_version(channel)
-        builds = android_builds(channel, builds)
+
+        query_params = ctx["request"].GET.copy()
+        utm_params = {k: v for k, v in query_params.items() if k.startswith("utm_") and v}
+
+        utm_params.setdefault("utm_source", "www.mozilla.org")
+        utm_params.setdefault("utm_medium", "referral")
+        utm_params.setdefault("utm_campaign", "download")
+
+        builds = android_builds(channel, builds, utm_params)
 
     if show_ios:
         version = firefox_ios.latest_version(channel)
@@ -199,11 +207,11 @@ def download_firefox_thanks(ctx, dom_id=None, locale=None, alt_copy=None, button
     channel = "release"
     locale = locale or get_locale(ctx["request"])
     dom_id = dom_id or "download-button-thanks"
-    transition_url = "/firefox/download/thanks/"
+    transition_url = f"{settings.FXC_BASE_URL}/thanks/"
     version = firefox_desktop.latest_version(channel)
 
     if locale_in_transition:
-        transition_url = f"/{locale}{transition_url}"
+        transition_url = f"{settings.FXC_BASE_URL}/{locale}/thanks/"
 
     download_link_direct = firefox_desktop.get_download_url(
         channel,
@@ -406,4 +414,34 @@ def send_to_device(
     )
 
     html = render_to_string("firefox/includes/send-to-device.html", context, request=request)
+    return Markup(html)
+
+
+@library.global_function
+@jinja2.pass_context
+def firefox_com_canonical_tag(ctx, dest_path=None, root_url=settings.FXC_BASE_URL):
+    """Create a <rel='canonical'...> link based on the URL of the current page, but swapping the
+    hostname for firefox.com (by default).
+
+    By default uses the same path as the current URL
+    By default targets FXC_BASE_URL (firefox.com) as the target root_url
+
+    Examples
+    ========
+
+    In Template
+    -----------
+
+        {{ firefox_com_canonical_tag() }}
+        {{ firefox_com_canonical_tag(dest_path="/some/alernative/path") }}
+        {{ firefox_com_canonical_tag(dest_path="/some/alernative/path", root_url="https://getfirefox.de") }}
+        {{ firefox_com_canonical_tag(root_url="https://some-subdomain.firefox.com") }}
+
+    """
+    request = ctx["request"]
+
+    _path = request.path if not dest_path else dest_path
+
+    html = f'<link rel="canonical" href="{root_url}{_path}">'
+
     return Markup(html)

@@ -123,7 +123,7 @@
       block_class='mzp-l-split-reversed'
     ) %}
       <h2>{{ ftl('misinformation-firefox-keeps-trackers-heading') }}</h2>
-      <p>{{ ftl('misinformation-firefox-keeps-trackers-desc', firefox=url('firefox.new'), protection='https://support.mozilla.org/kb/enhanced-tracking-protection-firefox-desktop' + _params) }}</p>
+      <p>{{ ftl('misinformation-firefox-keeps-trackers-desc', firefox="https://www.firefox.com/?redirect_source=mozilla-org", protection='https://support.mozilla.org/kb/enhanced-tracking-protection-firefox-desktop' + _params) }}</p>
     {% endcall %}
 
     {% call split(
@@ -133,17 +133,6 @@
       <h2>{{ ftl('misinformation-social-media-clean-heading') }}</h2>
       <p>{{ ftl('misinformation-social-media-clean-desc', container=url('firefox.facebookcontainer.index')) }}</p>
     {% endcall %}
-
-    {# Pocket recommendations in Firefox are currently shown to English and German audiences only. #}
-    {% if LANG.startswith('en-') or LANG == 'de' %}
-      {% call split(
-        image=resp_img('img/firefox/more/misinformation/pocket.svg', optional_attributes={ 'class': 'mzp-c-split-media-asset'}),
-        block_class='mzp-l-split-reversed'
-      ) %}
-        <h2>{{ ftl('misinformation-surface-content-heading') }}</h2>
-        <p>{{ ftl('misinformation-surface-content-desc', recommended='https://support.mozilla.org/kb/customize-new-tab-page' + _params, pocket_hits='https://getpocket.com/explore/pocket-hits-signup' + _params, pocket='https://getpocket.com/' + _params)}}</p>
-      {% endcall %}
-    {% endif %}
   </section>
 
   <div class="misinformation-learn-more">
@@ -163,7 +152,7 @@
         base_el='li'
       ) %}
         <p>
-          {{ ftl('misinformation-because-we-put-people-first', foundation='https://foundation.mozilla.org/' + _params) }}
+          {{ ftl('misinformation-because-we-put-people-first', foundation='https://www.mozillafoundation.org/' + _params) }}
         </p>
         <p><a href="{{ url('mozorg.mission') }}">{{ ftl('misinformation-learn-more-about-our-mission') }}</a></p>
       {% endcall %}

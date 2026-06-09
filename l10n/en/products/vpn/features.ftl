@@ -4,7 +4,6 @@
 
 ### URL: https://www-dev.allizom.org/products/vpn/features/
 
-vpn-features-page-title = Features - { -brand-name-mozilla-vpn }
 vpn-features-mozilla-vpn = { -brand-name-mozilla-vpn }
 
 # HTML page title
@@ -86,5 +85,5 @@ vpn-features-weve-been-audited = We’ve been audited by Cure53, a leading cyber
 vpn-features-people-over-profits = People over profits
 
 # Variables
-#   $mofo (url) - link to https://foundation.mozilla.org/
-vpn-features-were-backed-by-mofo = We’re backed by the <a { $mofo }>{ -brand-name-mozilla-foundation }</a>, a non-profit fighting to keep the web open and healthy for all people.
+#   $mofo (url) - link to https://www.mozillafoundation.org/
+vpn-features-were-backed-by-mofo-v2 = We’re backed by <a { $mofo }>{ -brand-name-mozilla-foundation }</a>, a non-profit fighting to keep the web open and healthy for all people.

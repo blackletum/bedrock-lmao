@@ -63,7 +63,7 @@
       <div class="accounts-products">
         <h2>{{ ftl('mozilla-account-sign-in-to') }}</h2>
 
-        <a href="{{ url('firefox') }}"><h4 class="mzp-c-wordmark mzp-t-wordmark-sm mzp-t-product-firefox">{{ ftl('firefox-accounts-firefox-browser') }}</h4></a>
+        <a href="https://www.firefox.com/"><h4 class="mzp-c-wordmark mzp-t-wordmark-sm mzp-t-product-firefox">{{ ftl('firefox-accounts-firefox-browser') }}</h4></a>
         <ul class="mzp-u-list-styled">
           {% if ftl_has_messages('firefox-accounts-send-a-tab', 'firefox-accounts-save-and-sync') %}
 
@@ -93,12 +93,6 @@
           {% else %}
             <li>{{ ftl('firefox-accounts-travel-the-internet') }}</li>
           {% endif %}
-        </ul>
-
-        <a href="https://getpocket.com/{{ referrals }}" rel="external noopener"><h4 class="mzp-c-wordmark mzp-t-wordmark-sm mzp-t-product-pocket">{{ ftl('firefox-accounts-pocket') }}</h4></a>
-        <ul class="mzp-u-list-styled">
-          <li>{{ ftl('firefox-accounts-save-articles') }}</li>
-          <li>{{ ftl('firefox-accounts-read-in-a') }}</li>
         </ul>
       </div>
 

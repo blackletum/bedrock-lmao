@@ -35,12 +35,10 @@ def _format_currency(price, currency, currency_locale):
 
 
 def _vpn_get_ga_data(selected_plan):
-    id = selected_plan.get("id")
     analytics = selected_plan.get("analytics")
 
     ga_data = (
         f"{{"
-        f"'id' : '{id}',"
         f"'brand' : '{analytics.get('brand')}',"
         f"'plan' : '{analytics.get('plan')}',"
         f"'period' : '{analytics.get('period')}',"
@@ -144,11 +142,20 @@ def vpn_subscribe_link(
     """
 
     product_id = settings.VPN_PRODUCT_ID
+
     available_plans = _vpn_get_available_plans(country_code, lang)
     selected_plan = available_plans.get(plan, VPN_12_MONTH_PLAN)
-    plan_id = selected_plan.get("id")
 
-    product_url = f"{settings.VPN_SUBSCRIPTION_URL}subscriptions/products/{product_id}?plan={plan_id}"
+    product_id = settings.VPN_PRODUCT_ID_NEXT
+    plan_slug = "yearly" if plan == VPN_12_MONTH_PLAN else "monthly"
+
+    # For testing/QA we support a test 'daily' API endpoint on the staging API only
+    # We only want to override the monthly VPN option when in QA mode; annual remains unchanged
+    # https://mozilla-hub.atlassian.net/browse/VPN-6985
+    if plan_slug == "monthly" and settings.VPN_SUBSCRIPTION_USE_DAILY_MODE__QA_ONLY:
+        plan_slug = "daily"
+
+    product_url = f"{settings.VPN_SUBSCRIPTION_URL_NEXT}{product_id}/{plan_slug}/landing/"
 
     if "analytics" in selected_plan:
         if class_name is None:
@@ -321,6 +328,7 @@ def vpn_product_referral_link(
     link_to_pricing_page=False,
     page_anchor="",
     link_text=None,
+    is_cta_button_styled=True,
     class_name=None,
     optional_attributes=None,
     optional_parameters=None,
@@ -338,7 +346,7 @@ def vpn_product_referral_link(
     """
 
     href = reverse("products.vpn.pricing") if link_to_pricing_page else reverse("products.vpn.landing")
-    css_class = "mzp-c-button js-fxa-product-referral-link"
+    css_class = "mzp-c-button js-fxa-product-referral-link" if is_cta_button_styled else "js-fxa-product-referral-link"
     attrs = f'data-referral-id="{referral_id}" '
 
     if optional_attributes:

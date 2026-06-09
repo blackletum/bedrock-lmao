@@ -358,15 +358,15 @@
     a:link,
     a:visited {
         color: $color-black;
+    }
 
-        &:hover,
-        &:focus,
-        &:active {
-            color: $link-color-hover;
+    a:hover,
+    a:focus,
+    a:active {
+        color: $link-color-hover;
 
-            @supports (--css: variables) {
-                color: var(--link-color-hover);
-            }
+        @supports (--css: variables) {
+            color: var(--link-color-hover);
         }
     }
 
@@ -403,10 +403,6 @@
 .mzp-c-modal-close {
     background: $color-green-40;
     border-radius: 100%;
-
-    button {
-        cursor: pointer;
-    }
 
     .mzp-c-modal-button-close {
         background-image: url('/media/protocol/img/icons/close.svg');

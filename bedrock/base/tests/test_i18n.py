@@ -72,7 +72,6 @@ def test_normalize_language_mozorg_mode(lang_code, expected):
     (
         ("media", False),
         ("static", False),
-        ("certs", False),
         ("images", False),
         ("credits", False),
         ("robots.txt", False),
@@ -90,8 +89,8 @@ def test_normalize_language_mozorg_mode(lang_code, expected):
         ("xbl", False),
         ("revision.txt", False),
         ("locales", False),
-        ("/sitemap_none.xml", False),
-        ("/sitemap.xml", False),
+        ("/all-urls-global.xml", False),
+        ("/all-urls.xml", False),
         # Some example paths that do need them
         ("/about/", True),
         ("about", True),

@@ -6,97 +6,63 @@
 
 {% extends 'includes/banners/basic.html' %}
 
-{% block banner_id %}fundraising-banner{% endblock %}
+{% block banner_id %}fundraising-banner-eoy2025{% endblock %}
 
 {% block banner_class %}c-banner-fundraising{% endblock %}
 
 {% if LANG =="de" %}
-  {% set banner_title = 'Bitte spende bis 31. Dez. an Mozilla' %}
-  {% set banner_tagline_a = 'Wir haben unser Spendenziel für 2024 fast geknackt, aber noch nicht ganz.' %}
-  {% set banner_tagline_b = 'Die Zeit läuft aus für unser Spendenziel 2024. Könntest du noch heute helfen?' %}
-  {% set banner_tagline_c = 'Gemeinsam müssen wir unsere Bewegung zur Rückeroberung des Internets ausbauen.' %}
+  {% set banner_title = 'Spende jetzt an die Mozilla Foundation' %}
+  {% set banner_tagline = 'Wir brauchen deine Hilfe, um unser Ziel für 2025 bis zum 31. Dezember zu erreichen.' %}
   {% set banner_button = 'Spenden' %}
 {% elif LANG.startswith('es-') %}
-  {% set banner_title = 'Dona a Mozilla antes del 31/12' %}
-  {% set banner_tagline_a = 'Casi alcanzamos nuestra meta para 2024, pero aún nos falta.' %}
-  {% set banner_tagline_b = 'Nuestra fecha límite está próxima. ¿Puedes donar?' %}
-  {% set banner_tagline_c = 'Debemos construir juntos el movimiento para recuperar Internet.' %}
-  {% set banner_button = 'Dona' %}
+  {% set banner_title = 'Dona a la Fundación Mozilla' %}
+  {% set banner_tagline = 'Necesitamos tu ayuda para alcanzar nuestra meta de 2025 para el 31 de diciembre.' %}
+  {% set banner_button = 'Donar' %}
 {% elif LANG == "fr" %}
-  {% set banner_title = 'Faites un don à Mozilla avant le 31/12' %}
-  {% set banner_tagline_a = 'Nous approchons de notre objectif 2024 : aidez-nous à l’atteindre !' %}
-  {% set banner_tagline_b = 'Notre collecte de fonds touche à sa fin. Vite, soutenez notre action !' %}
-  {% set banner_tagline_c = 'Unissons nos forces pour reprendre ensemble la main sur Internet.' %}
+  {% set banner_title = 'Faites un don à la Fondation Mozilla' %}
+  {% set banner_tagline = 'Nous avons besoin de votre aide pour atteindre notre objectif 2025 d\'ici le 31 décembre.' %}
   {% set banner_button = 'Je fais un don' %}
 {% elif LANG == "it" %}
-  {% set banner_title = 'Dona a Mozilla entro il 31 dicembre' %}
-  {% set banner_tagline_a = 'Siamo vicini al nostro obiettivo del 2024, ma ci serve un ultimo sforzo.' %}
-  {% set banner_tagline_b = 'La scadenza del 2024 si avvicina a passo svelto. Puoi darci una mano?' %}
-  {% set banner_tagline_c = 'Insieme, dobbiamo creare un movimento per liberare il potenziale di internet.' %}
+  {% set banner_title = 'Dona a Mozilla Foundation' %}
+  {% set banner_tagline = 'Abbiamo bisogno del tuo aiuto per raggiungere il nostro obiettivo 2025 entro il 31 dicembre.' %}
   {% set banner_button = 'Dona' %}
 {% elif LANG == "pl" %}
-  {% set banner_title = 'Przekaż datek Mozilli do 31 grudnia' %}
-  {% set banner_tagline_a = 'Już prawie osiągnęliśmy cel na 2024 rok, ale jeszcze trochę brakuje.' %}
-  {% set banner_tagline_b = 'Już niedługo mija termin na 2024 rok. Czy możesz przekazać nam datek?' %}
-  {% set banner_tagline_c = 'Musimy razem stworzyć ruch, który odzyska Internet.' %}
-  {% set banner_button = 'Wpłać datek' %}
-{% elif LANG == "pt-BR" %}
-  {% set banner_title = 'Doe para a Mozilla até 31 de dezembro' %}
-  {% set banner_tagline_a = 'Falta pouco para atingirmos nossa meta para 2024.' %}
-  {% set banner_tagline_b = 'Nosso prazo para 2024 está quase no fim. Poderia fazer uma doação?' %}
-  {% set banner_tagline_c = 'Juntos, devemos promover o movimento para recuperar a internet.' %}
+  {% set banner_title = 'Wesprzyj Fundację Mozilla' %}
+  {% set banner_tagline = 'Potrzebujemy Twojej pomocy, aby osiągnąć nasz cel na 2025 rok do 31 grudnia.' %}
+  {% set banner_button = 'Wpłać datek ' %}
+{% elif LANG.startswith('pt-') %}
+  {% set banner_title = 'Doe para a Fundação Mozilla' %}
+  {% set banner_tagline = 'Precisamos da sua ajuda para alcançar a nossa meta de 2025 até 31 de dezembro.' %}
   {% set banner_button = 'Doe agora' %}
 {% else %}
-  {% set banner_title = 'Donate to Mozilla by Dec&nbsp;31' %}
-  {% set banner_tagline_a = 'We’re close to reaching our 2024 goal, but we’re not there yet.' %}
-  {% set banner_tagline_b = 'We’re quickly approaching our 2024 deadline. Can you donate?' %}
-  {% set banner_tagline_c = 'Together we must build the movement to reclaim the internet.' %}
+  {% set banner_title = 'Donate to Mozilla Foundation' %}
+  {% set banner_tagline = 'We need your help to reach our 2025 goal by December 31.' %}
   {% set banner_button = 'Donate' %}
 {% endif %}
 
-{% if variant == "a" %}
-  {% set banner_link = 'https://foundation.mozilla.org/?form=eoy-final-a' %}
-  {% set banner_tagline = banner_tagline_a %}
-{% elif variant == "b" %}
-  {% set banner_link = 'https://foundation.mozilla.org/?form=eoy-final-b' %}
-  {% set banner_tagline = banner_tagline_b %}
-{% elif variant == "c" %}
-  {% set banner_link = 'https://foundation.mozilla.org/?form=eoy-final-c' %}
-  {% set banner_tagline = banner_tagline_c %}
-{% else %}
-  {# GPC/DNT #}
-  {% set banner_link = 'https://foundation.mozilla.org/?form=eoy-final-d' %}
-  {% set banner_tagline = banner_tagline_a %}
-{% endif %}
-
-{% set banner_ga_label = 'Donate' %}
+{% set banner_link = 'https://www.mozillafoundation.org/?form=eoy25-fp-moco-banner' %}
 
 {% block banner_content %}
   <div class="c-banner-outer">
     <div class="c-banner-inner">
       <div class="c-banner-copy">
-        <h2 class="c-banner-title">{{ banner_title|safe }}</h2>
+        <h2 class="c-banner-title">{{ banner_title }}</h2>
         <p class="c-banner-tagline">{{ banner_tagline }}</p>
-        <a class="c-banner-button mzp-c-button mzp-t-lg" href="{{ banner_link }}" data-cta-text="{{ banner_ga_label }}">
+        <a id="fundraising-banner-eoy2025-link" class="c-banner-button mzp-c-button mzp-t-secondary mzp-t-lg" href="{{ banner_link }}" data-cta-text="Donate" data-cta-position="banner">
           {{ banner_button }}
         </a>
       </div>
+      <a href="{{ banner_link }}" aria-labelledby="fundraising-banner-eoy2025-link">
       {{ picture(
-        url='img/banners/fundraiser/eoy-2024-photo-200.png',
+        url='img/banners/fundraiser/computer-200.png',
         sources=[
           {
             'media': '(min-width: 688px)',
             'srcset': {
-              'img/banners/fundraiser/eoy-2024-photo-200.png': '200w',
-              'img/banners/fundraiser/eoy-2024-photo-400.png': '400w',
+              'img/banners/fundraiser/computer-200.png': '200w',
+              'img/banners/fundraiser/computer-400.png': '400w',
             }
           },
-          {
-            'media': '(max-width: 687px)',
-            'srcset': {
-              'img/placeholder.png': 'default'
-            }
-          }
         ],
         optional_attributes={
           'height': '200',
@@ -104,6 +70,7 @@
           'class': 'c-banner-media'
         }
       ) }}
+      </a>
     </div>
   </div>
 {% endblock %}

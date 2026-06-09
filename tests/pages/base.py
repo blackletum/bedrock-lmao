@@ -5,8 +5,6 @@
 from pypom import Page, Region
 from selenium.webdriver.common.by import By
 
-from pages.regions.newsletter import NewsletterEmbedForm
-
 
 class ScrollElementIntoView:
     def scroll_element_into_view(self, strategy, locator):
@@ -40,16 +38,10 @@ class BasePage(ScrollElementIntoView, Page):
     def navigation(self):
         return self.Navigation(self)
 
-    @property
-    def newsletter(self):
-        return NewsletterEmbedForm(self)
-
     class Navigation(BaseRegion):
         _root_locator = (By.CLASS_NAME, "m24-navigation-refresh")
         _toggle_locator = (By.CLASS_NAME, "m24-c-navigation-menu-button")
         _menu_locator = (By.CLASS_NAME, "m24-c-navigation-items")
-        _firefox_menu_link_locator = (By.CSS_SELECTOR, '.m24-c-menu-title[aria-controls="m24-c-menu-panel-firefox"]')
-        _firefox_menu_locator = (By.ID, "m24-c-menu-panel-firefox")
         _products_menu_link_locator = (By.CSS_SELECTOR, '.m24-c-menu-title[aria-controls="m24-c-menu-panel-products"]')
         _products_menu_locator = (By.ID, "m24-c-menu-panel-products")
         _about_menu_link_locator = (By.CSS_SELECTOR, '.m24-c-menu-title[aria-controls="m24-c-menu-panel-about"]')
@@ -65,20 +57,12 @@ class BasePage(ScrollElementIntoView, Page):
             menu.click()
 
         @property
-        def is_firefox_menu_displayed(self):
-            return self.is_element_displayed(*self._firefox_menu_locator)
-
-        @property
         def is_products_menu_displayed(self):
             return self.is_element_displayed(*self._products_menu_locator)
 
         @property
         def is_about_menu_displayed(self):
             return self.is_element_displayed(*self._about_menu_locator)
-
-        def open_firefox_menu(self):
-            self.open_navigation_menu(self._firefox_menu_link_locator)
-            self.wait.until(lambda s: self.is_firefox_menu_displayed)
 
         def open_products_menu(self):
             self.open_navigation_menu(self._products_menu_link_locator)

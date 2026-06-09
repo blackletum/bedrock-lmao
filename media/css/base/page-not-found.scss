@@ -2,10 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-@import '~@mozilla-protocol/core/protocol/css/includes/lib';
-
-$font-path: '/media/protocol/fonts';
-$image-path: '/media/protocol/img';
+@use '~@mozilla-protocol/core/protocol/css/includes/lib' as *;
 
 .page-header {
     .mzp-l-content {
@@ -15,20 +12,6 @@ $image-path: '/media/protocol/img';
 
     .header-image {
         .logo-mozilla {
-            display: inline-block;
-
-            &::after {
-                @include bidi(((float, right, left),));
-                background: $color-marketing-gray-30;
-                content: '';
-                height: 60px;
-                margin: -10px $spacing-lg 0;
-                width: 2px;
-            }
-        }
-
-        .logo-firefox {
-            @include bidi(((transform, translateX(-5px), translateX(5px)),));
             display: inline-block;
         }
     }
@@ -53,6 +36,9 @@ $image-path: '/media/protocol/img';
 
     & > li {
         margin-bottom: $spacing-lg;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
     }
 
     a:link,
@@ -64,8 +50,8 @@ $image-path: '/media/protocol/img';
 
     .list-icon {
         @include bidi((
-            (padding-left, auto, $spacing-md),
-            (padding-right, $spacing-md, auto),
+            (padding-left, unset, $spacing-md),
+            (padding-right, $spacing-md, unset),
         ));
         vertical-align: top;
     }
@@ -77,7 +63,7 @@ $image-path: '/media/protocol/img';
     cursor: pointer;
 
     &::before {
-        content: '\2190\0020';
+        @include bidi(((content, '\2190\0020', '\2192\0020'),));
     }
 }
 

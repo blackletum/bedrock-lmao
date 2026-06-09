@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+from django.conf import settings
+
 from bedrock.redirects.util import gone, redirect, ua_redirector
 
 
@@ -13,15 +15,17 @@ def to_uppercase(url):
     return decider
 
 
+FXC_URL = settings.FXC_BASE_URL.strip("/") + "/"
+
 redirectpatterns = (
     # bug 874913, 681572
-    redirect(r"^(products/)?download\.html", "firefox.new", query=""),
+    redirect(r"^(products/)?download\.html", f"{FXC_URL}/en-US/", query=""),
     # bug 845580
-    redirect(r"^home/?$", "firefox.new"),
+    redirect(r"^home/?$", FXC_URL),
     # bug 948605
-    redirect(r"^firefox/xp", "firefox.new"),
+    redirect(r"^firefox/xp", FXC_URL),
     # bug 875052
-    redirect(r"^start/", ua_redirector("seamonkey", "http://www.seamonkey-project.org/start/", "firefox.new"), cache_timeout=0),
+    redirect(r"^start/", ua_redirector("seamonkey", "http://www.seamonkey-project.org/start/", FXC_URL), cache_timeout=0),
     # bug 856081 redirect /about/drivers https://wiki.mozilla.org/Firefox/Drivers
     redirect(r"^about/drivers(\.html|/)?$", "https://wiki.mozilla.org/Firefox/Drivers"),
     # community
@@ -55,7 +59,7 @@ redirectpatterns = (
     # bug 975476
     redirect(r"^projects/security/pki/python-nss/doc/api/current/html(?P<path>.*)$", "https://mozilla.github.io/python-nss-docs{path}"),
     # bug 780672
-    redirect(r"^firefox/webhero", "firefox.new"),
+    redirect(r"^firefox/webhero", FXC_URL),
     # bug 964107
     redirect(r"^firefox/video", "https://www.youtube.com/firefoxchannel"),
     # bug 948520
@@ -74,11 +78,11 @@ redirectpatterns = (
     # Bug 1144949
     redirect(r"^contribute/page/?$", "https://wiki.mozilla.org/Webdev/GetInvolved/mozilla.org"),
     # Bug 763665, 1148127
-    redirect(r"^projects/?$", "firefox"),
-    # Bug 792185 Brand Toolkit -> Style Guide, Issue 8418
-    redirect(r"^firefox/brand(/.*)?", "https://mozilla.design/firefox/"),
-    # Bug 804810 Identity Guidelines -> Style Guide, Issue 8418
-    redirect(r"^foundation/identity-guidelines(/.*)?", "https://mozilla.design/mozilla/"),
+    redirect(r"^projects/?$", FXC_URL),
+    # Bug 792185 Brand Toolkit -> Style Guide, Issue 8418, 17044
+    redirect(r"^firefox/brand(/.*)?", "https://brand.firefox.com/"),
+    # Bug 804810 Identity Guidelines -> Style Guide, Issue 8418, 17044
+    redirect(r"^foundation/identity-guidelines(/.*)?", "https://brand.mozilla.com/"),
     # Bug 945474 - delete Marketplace marketing product page
     # and redirect
     redirect(r"^apps/?$", "https://marketplace.firefox.com/"),
@@ -90,9 +94,9 @@ redirectpatterns = (
     # Bug 1109318 /privacy/you -> privacy/tips/
     # Bug 1238687 /privacy/tips -> teach/smarton/
     # Bug 1436740 /privacy/tips -> internet-health/privacy-security/
-    # Issue 8375 /internet-health/ -> foundation.mozilla.org
-    redirect(r"^privacy/you/?$", "https://foundation.mozilla.org/internet-health/"),
-    redirect(r"^privacy/tips/?$", "https://foundation.mozilla.org/internet-health/"),
+    # Issue 8375 /internet-health/ -> www.mozillafoundation.org
+    redirect(r"^privacy/you/?$", "https://www.mozillafoundation.org/internet-health/"),
+    redirect(r"^privacy/tips/?$", "https://www.mozillafoundation.org/internet-health/"),
     # Bug 821047 /about/mission.html -> /mission/
     redirect(r"^about/mission\.html$", "/mission/"),
     # Bug 784411 /about/mission/ -> /mission/
@@ -246,7 +250,7 @@ redirectpatterns = (
     ),
     redirect(r"^access/windows/msaa-server\.html$", "https://developer.mozilla.org/docs/Web/Accessibility/Implementing_MSAA_server"),
     redirect(r"^access/windows/zoomtext\.html$", "https://developer.mozilla.org/docs/Mozilla/Accessibility/ZoomText"),
-    redirect(r"^access/donate(\.html|/)?$", "https://foundation.mozilla.org/donate/"),
+    redirect(r"^access/donate(\.html|/)?$", "https://www.mozillafoundation.org/donate/"),
     # bug 1148187
     redirect(r"^access/(?P<page>.+)$", "http://website-archive.mozilla.org/www.mozilla.org/access/access/{page}"),
     # bug 987852
@@ -327,8 +331,8 @@ redirectpatterns = (
     redirect(r"^foundation/donate_form\.pdf$", "https://static.mozilla.com/foundation/documents/donate_form.pdf", re_flags="i"),
     # openwebfund/ and openwebfund/index.html redirect to another site.  Careful because
     # there are other pages under openwebfund that still need to be served from Bedrock.
-    redirect(r"^foundation/openwebfund/(index\.html)?$", "https://foundation.mozilla.org/donate/", re_flags="i"),
-    redirect(r"^foundation/donate\.html$", "https://foundation.mozilla.org/donate/", re_flags="i"),
+    redirect(r"^foundation/openwebfund/(index\.html)?$", "https://www.mozillafoundation.org/donate/", re_flags="i"),
+    redirect(r"^foundation/donate\.html$", "https://www.mozillafoundation.org/donate/", re_flags="i"),
     # FIXUPs for changing foo/bar.html to foo/bar/
     # Redirect foundation/foo.html to foundation/foo/, with a redirect for the nice search engines
     redirect(r"^foundation/(?P<page>about|careers|licensing|moco|mocosc)\.html$", "/foundation/{page}/", re_flags="i"),
@@ -370,7 +374,7 @@ redirectpatterns = (
     # bug 1236910
     redirect(r"^support(/.*)?$", "https://support.mozilla.org/"),
     # Bug 1235853
-    redirect(r"^facebookapps(/.*)?$", "firefox.new"),
+    redirect(r"^facebookapps(/.*)?$", FXC_URL),
     # Bug 1255882
     redirect(r"^firefox/about/?$", "mozorg.about.index"),
     # bug 453506, 1255882
@@ -391,7 +395,7 @@ redirectpatterns = (
     # Bug 1262593
     redirect(r"^unix/remote\.html$", "http://www-archive.mozilla.org/unix/remote.html"),
     # Bug 1313023
-    redirect(r"^story/?$", "https://foundation.mozilla.org/donate/"),
+    redirect(r"^story/?$", "https://www.mozillafoundation.org/donate/"),
     # Bug 1317260
     redirect(
         r"^about/governance/policies/security-group/certs/policy/(?P<anchor>inclusion|maintenance|enforcement)/?",
@@ -404,11 +408,11 @@ redirectpatterns = (
     # Bug 1332008, 1525853
     redirect(r"^protocol/?$", "https://protocol.mozilla.org"),
     # Bug 1322959 - vanity URL, Issue 8375
-    redirect(r"^onlineprivacy/?$", "https://foundation.mozilla.org/internet-health/"),
+    redirect(r"^onlineprivacy/?$", "https://www.mozillafoundation.org/internet-health/"),
     # Bug 1335569 - vanity URL, Issue 8375
-    redirect(r"^digital-inclusion/?$", "https://foundation.mozilla.org/internet-health/"),
+    redirect(r"^digital-inclusion/?$", "https://www.mozillafoundation.org/internet-health/"),
     # Bug 1344270 - vanity URL, Issue 8375
-    redirect(r"^open-innovation/?$", "https://foundation.mozilla.org/internet-health/"),
+    redirect(r"^open-innovation/?$", "https://www.mozillafoundation.org/internet-health/"),
     # Bug 1333146
     redirect(r"^internet-?health-?report/?$", "https://internethealthreport.org/"),
     # Bug 1335040
@@ -426,7 +430,7 @@ redirectpatterns = (
         },
     ),
     # Bug 1361194, Issue 8375
-    redirect(r"^internethealth/?$", "https://foundation.mozilla.org/internet-health/"),
+    redirect(r"^internethealth/?$", "https://www.mozillafoundation.org/internet-health/"),
     # Bug 1384370, Issue 7840
     redirect(r"^developers/?$", "https://developer.mozilla.com/"),
     # Bug 1438464
@@ -445,13 +449,13 @@ redirectpatterns = (
     redirect(r"^about/partnerships\.html", "mozorg.contact.contact-landing"),
     redirect(r"^about/partnerships/distribution/?$", "/foundation/trademarks/distribution-policy/"),
     # Bug 1436740, Issue 8375
-    redirect(r"^teach/?$", "https://foundation.mozilla.org/internet-health/"),
-    redirect(r"^teach/smarton/?$", "https://foundation.mozilla.org/internet-health/"),
-    redirect(r"^teach/smarton/(?:tracking|security|surveillance)/?$", "https://foundation.mozilla.org/internet-health/"),
+    redirect(r"^teach/?$", "https://www.mozillafoundation.org/internet-health/"),
+    redirect(r"^teach/smarton/?$", "https://www.mozillafoundation.org/internet-health/"),
+    redirect(r"^teach/smarton/(?:tracking|security|surveillance)/?$", "https://www.mozillafoundation.org/internet-health/"),
     # issue 6266
     redirect(r"^about/policy/leandata/?$", "mozorg.about.policy.lean-data.index"),
     # Issue 6756 - vanity URL, Issue 8375
-    redirect(r"^decentralization/?$", "https://foundation.mozilla.org/internet-health/"),
+    redirect(r"^decentralization/?$", "https://www.mozillafoundation.org/internet-health/"),
     # issue 6971
     redirect(r"^gear/?$", "https://wiki.mozilla.org/SwagStore"),
     # issue 6994
@@ -471,11 +475,11 @@ redirectpatterns = (
     redirect(r"^developer/?$", "https://developer.mozilla.com/"),
     redirect(r"^developer/browsertest/?$", "https://developer.mozilla.org/docs/Learn/Tools_and_testing/Cross_browser_testing/Automated_testing"),
     redirect(r"^developer/css-grid/?$", "https://developer.mozilla.org/docs/Learn/CSS/CSS_layout/Grids"),
-    # Issue 8418
-    redirect(r"^styleguide/products/firefox(.+)", "https://mozilla.design/firefox/"),
-    redirect(r"^styleguide/identity/firefox(.+)", "https://mozilla.design/firefox/"),
-    redirect(r"^styleguide/identity/mozilla(.+)", "https://mozilla.design/mozilla/"),
-    redirect(r"^styleguide(/.*)?", "https://mozilla.design/"),
+    # Issue 8418, 17044
+    redirect(r"^styleguide/products/firefox(.+)", "https://brand.firefox.com/"),
+    redirect(r"^styleguide/identity/firefox(.+)", "https://brand.firefox.com/"),
+    redirect(r"^styleguide/identity/mozilla(.+)", "https://brand.mozilla.com/"),
+    redirect(r"^styleguide(/.*)?", "https://brand.mozilla.com/all-brands"),
     # Issue 8644, 8932, 15613
     redirect(r"^builders/?$", "https://builders.mozilla.org/"),
     # Issue 6824, 14364
@@ -488,22 +492,22 @@ redirectpatterns = (
     redirect(r"^technology/incognito-browser/?$", "firefox.browsers.incognito-browser"),
     redirect(r"^technology/browser-history/?$", "firefox.browsers.browser-history"),
     # Issue 8536, 11891
-    redirect(r"^etc/firefox/retention(/.*)?", "firefox"),
-    redirect(r"^firefox/retention/thank-you/?", "firefox"),
+    redirect(r"^etc/firefox/retention(/.*)?", FXC_URL),
+    redirect(r"^firefox/retention/thank-you/?", FXC_URL),
     # Issue 8374
     redirect(r"^plugincheck/?$", "https://support.mozilla.org/kb/npapi-plugins/"),
     # Vanity URL for EKR's blog
     redirect(r"^ekr/?$", "https://blog.mozilla.org/blog/author/ekrmozilla-com/"),
     # Issue 8375
-    redirect(r"^internet-health(/.*)?", "https://foundation.mozilla.org/internet-health/"),
+    redirect(r"^internet-health(/.*)?", "https://www.mozillafoundation.org/internet-health/"),
     # Issue 8949
-    redirect(r"^donate/?$", "https://foundation.mozilla.org/donate/"),
+    redirect(r"^donate/?$", "https://www.mozillafoundation.org/donate/"),
     redirect(r"^about/governance/policies/security/plugin-whitelist-policy/?$", "https://wiki.mozilla.org/Plugins/Firefox_Whitelist"),
     redirect(r"^about/governance/policies/security-group/tld-idn/?$", "https://wiki.mozilla.org/IDN_Display_Algorithm"),
     # Issue 9560
     redirect(
         r"^openletter/?$",
-        "https://foundation.mozilla.org/en/campaigns/sign-letter-AICOA/",
+        "https://www.mozillafoundation.org/en/campaigns/sign-letter-AICOA/",
         query={
             "utm_campaign": "2022antitrust",
             "utm_content": "shortlink",
@@ -518,18 +522,13 @@ redirectpatterns = (
     # Issue 9984
     redirect(r"^/about/legal/fraud-report/?$", "/about/legal/defend-mozilla-trademarks/"),
     # Issue 11204
-    redirect(r"^(truecolou?rs|turningred)/?$", "firefox"),
+    redirect(r"^(truecolou?rs|turningred)/?$", FXC_URL),
     # Issue 11991
     redirect(r"^transparency/?$", "mozorg.about.policy.transparency.index"),
     # Issue 14231
     redirect(r"^santa-?locator/?$", "mozorg.home"),
-    redirect(r"^landing/firefox/fx100/?$", "firefox"),
-    # Issue 12563
-    redirect(r"^/exp/firefox/?$", "firefox"),
-    redirect(r"^/exp/firefox/new/?$", "firefox.new"),
+    redirect(r"^landing/firefox/fx100/?$", FXC_URL),
     redirect(r"^accounts/?$", "mozorg.account"),
-    # redirect(r"^/exp/firefox/accounts/?$", "mozorg.account"),
-    redirect(r"^/exp/opt-out/?$", "https://www.convert.com/opt-out/"),
     # Issue 13211
     redirect(r"^/en/$", "/en-US/", permanent=True),
     # Issue 13554
@@ -552,8 +551,8 @@ redirectpatterns = (
     # Issue 14255
     redirect(r"^rise25/?$", "/rise25/nominate/"),
     # Issue 14351
-    redirect(r"^research/?$", "https://foundation.mozilla.org/research/"),
-    redirect(r"^research/cc/?$", "https://foundation.mozilla.org/research/library/?topics=187"),
+    redirect(r"^research/?$", "https://www.mozillafoundation.org/research/"),
+    redirect(r"^research/cc/?$", "https://www.mozillafoundation.org/research/library/?topics=187"),
     # redirects that don't need a lang code prefix
     redirect(r"^diversity/?$", "mozorg.diversity.2022.index", locale_prefix=False),
     redirect(r"^webvision/?$", "mozorg.about.webvision.summary", locale_prefix=True, prepend_locale=False),

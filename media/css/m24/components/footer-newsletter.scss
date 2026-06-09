@@ -53,7 +53,7 @@ $max-footer-content-width: $content-max;
         }
 
         @media #{$mq-lg} {
-            width: grid(4);
+            width: calc((100% - $grid-gutter) / 2);
             flex-wrap: nowrap;
         }
 
@@ -61,8 +61,11 @@ $max-footer-content-width: $content-max;
             margin-bottom: 0;
             line-height: 1.3;
             font-weight: 600;
-            font-family: $primary-font;
             text-align: start;
+
+            @media #{$mq-lg} {
+                width: 65%;
+            }
         }
     }
 
@@ -87,7 +90,7 @@ $max-footer-content-width: $content-max;
         }
 
         @media #{$mq-lg} {
-            width: grid(8);
+            width: calc((100% - $grid-gutter) / 2);
         }
 
         h2 {
@@ -100,13 +103,11 @@ $max-footer-content-width: $content-max;
             }
 
             p {
-                font-family: $primary-font;
                 font-weight: 400;
             }
         }
 
         .error-try-again-later {
-            font-family: $primary-font;
             font-weight: 400;
         }
     }
@@ -123,7 +124,6 @@ $max-footer-content-width: $content-max;
             margin-bottom: 0;
             line-height: 1.3;
             font-weight: 600;
-            font-family: $primary-font;
             text-align: start;
 
             @media #{$mq-lg} {
@@ -165,7 +165,6 @@ $max-footer-content-width: $content-max;
         input[type="email"] {
             margin-bottom: $spacer-lg;
             width: 100%;
-            font-family: $primary-font;
 
             @media #{$mq-md} {
                 min-width: 100%;
@@ -177,10 +176,9 @@ $max-footer-content-width: $content-max;
         }
 
         select {
-            font-family: $primary-font;
             width: 100%;
             @include bidi(((background-position, right 8px center, 8px center),));
-            background: $m24-color-light-gray url('/media/img/icons/m24-small/down-caret-white.svg') no-repeat;
+            background: $m24-color-light-gray url('/media/protocol/img/icons/caret-down-white.svg') no-repeat;
             background-size: 16px 16px;
 
             @media #{$mq-lg} {
@@ -193,7 +191,7 @@ $max-footer-content-width: $content-max;
             &:focus-within {
                 color: $m24-color-alt-white;
                 @include bidi(((background-position, right 8px center, 8px center),));
-                background: $m24-color-alt-black url('/media/img/icons/m24-small/down-caret.svg') no-repeat;
+                background: $m24-color-alt-black url('/media/protocol/img/icons/caret-down.svg') no-repeat;
                 background-size: 16px 16px;
             }
         }
@@ -230,7 +228,6 @@ $max-footer-content-width: $content-max;
             margin-bottom: 0;
             line-height: 1.3;
             font-weight: 600;
-            font-family: $primary-font;
             text-align: start;
 
             @media #{$mq-lg} {

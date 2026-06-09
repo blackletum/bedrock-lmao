@@ -104,6 +104,9 @@ check_status_and_handle_failure "Dumping wagtailcore.Locale"
 # wagtailimages.Rendition       # Excluded: Renditions
 # wagtail_localize_smartling    # Excluded wholesale: translation data may leak draft content
 # wagtail_localize              # Excluded wholesale: translation data may leak draft content
+#                               # However, it is possible to link the translated pages and strings
+#                               # in the export by running the link_translations_after_export
+#                               # management command.
 # wagtailsearch.IndexEntry      # Excluded: WagtailSearch indices need rebuilding and search history is not important
 # wagtailcore.Locale            # Excluded: dumped separately
 # wagtailcore.ModelLogEntry     # Excluded: may contain PII
@@ -159,20 +162,36 @@ python manage.py dumpdata \
     cms.SimpleRichTextPage \
     cms.BedrockImage \
     legal_docs.LegalDoc \
+    anonym.AnonymIndexPage \
+    anonym.AnonymContentSubPage \
+    anonym.AnonymNewsPage \
+    anonym.AnonymNewsItemPage \
+    anonym.AnonymCaseStudyItemPage \
+    anonym.AnonymCaseStudyPage \
+    anonym.AnonymContactPage \
+    anonym.Person \
     mozorg.WebvisionDoc \
     mozorg.LeadershipPage \
+    mozorg.AdvertisingIndexPage \
+    mozorg.AdvertisingTwoColumnSubpage \
+    mozorg.ContentSubpage \
+    mozorg.HomePage \
+    mozorg.AboutUsPage \
+    mozorg.ContactBannerSnippet \
+    mozorg.NotificationSnippet \
     newsletter.Newsletter \
     products.VPNCallToActionSnippet \
     products.VPNResourceCenterIndexPage \
     products.VPNResourceCenterDetailPage \
+    products.MonitorCallToActionSnippet \
+    products.MonitorArticleIndexPage \
+    products.MonitorArticlePage \
     externalfiles.ExternalFile \
     security.Product \
     security.SecurityAdvisory \
     security.HallOfFamer \
-    security.MitreCVE \
     releasenotes.ProductRelease \
     contentcards.ContentCard \
-    contentful.ContentfulEntry \
     utils.GitRepoState \
     wordpress.BlogPost \
     sitemaps.SitemapURL \
@@ -192,6 +211,7 @@ export DATABASE_URL=sqlite:///$output_db  # Note that the three slashes is key 
 check_status_and_handle_failure "Setting up new output DB at $output_db"
 
 PROD_DETAILS_STORAGE=product_details.storage.PDFileStorage \
+SQLITE_EXPORT_MODE=True \
     python manage.py migrate || all_well=false
 
 check_status_and_handle_failure "Running Django migrations"
@@ -319,6 +339,13 @@ echo "Restored original DATABASE_URL to $DATABASE_URL"
 check_status_and_handle_failure "Checking all_well at the end of the run"
 
 echo "Export to $output_db successful"
+
+echo ""
+echo "NOTE: Translation linking is not run automatically."
+echo "To link translated pages so they appear connected in the Wagtail admin, run:"
+echo "  DATABASE_URL=sqlite:///$output_db python manage.py link_translations_after_export"
+echo "This takes a few minutes to complete."
+echo ""
 
 # If all is well, ping DMS to avoid an alert being raised.
 if [[ -n "${DB_EXPORT_SCRIPT_DMS_URL}" ]]; then

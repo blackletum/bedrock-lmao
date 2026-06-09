@@ -58,11 +58,22 @@
     --text-title-sm: 16px;
     --text-title-xs: 14px;
 
+    // titles line height
+    --text-title-2xl-line-height: 1.166;
+    --text-title-xl-line-height: 1.125;
+    --text-title-lg-line-height: 1.166;
+    --text-title-md-line-height: 1.25;
+    --text-title-sm-line-height: 1.25;
+    --text-title-xs-line-height: 1.25;
+
     // body
     --text-body-xl: 24px;
     --text-body-lg: 18px;
     --text-body-md: 16px;
     --text-body-sm: 14px;
+
+    // body line height
+    --text-body-line-height: 1.5;
 
     // buttons
     --text-button-xl: 24px;
@@ -160,86 +171,4 @@
         // labels
         --text-label: 16px;
     }
-}
-
-$m24-font-path: '/media/fonts/m24';
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Text';
-    font-style: normal;
-    font-weight: normal;
-    src:
-        url('#{$m24-font-path}/mozilla-text/MozillaText-Regular.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-text/MozillaText-Regular.woff') format('woff');
-}
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Text';
-    font-style: normal;
-    font-weight: 600;
-    src:
-        url('#{$m24-font-path}/mozilla-text/MozillaText-SemiBold.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-text/MozillaText-SemiBold.woff') format('woff');
-}
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Text';
-    font-style: italic;
-    font-weight: 600;
-    src:
-        url('#{$m24-font-path}/mozilla-text/MozillaText-SemiBoldItalic.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-text/MozillaText-SemiBoldItalic.woff') format('woff');
-}
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Text';
-    font-style: normal;
-    font-weight: bold;
-    src:
-        url('#{$m24-font-path}/mozilla-text/MozillaText-Bold.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-text/MozillaText-Bold.woff') format('woff');
-}
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Text';
-    font-style: italic;
-    font-weight: normal;
-    src:
-        url('#{$m24-font-path}/mozilla-text/MozillaText-Italic.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-text/MozillaText-Italic.woff') format('woff');
-}
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Text';
-    font-style: italic;
-    font-weight: bold;
-    src:
-        url('#{$m24-font-path}/mozilla-text/MozillaText-BoldItalic.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-text/MozillaText-BoldItalic.woff') format('woff');
-}
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Headline';
-    font-style: normal;
-    font-weight: normal;
-    src:
-        url('#{$m24-font-path}/mozilla-headline/MozillaHeadline-Regular.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-headline/MozillaHeadline-Regular.woff') format('woff');
-}
-
-@font-face {
-    font-display: swap;
-    font-family: 'Mozilla Headline';
-    font-style: normal;
-    font-weight: 600;
-    src:
-        url('#{$m24-font-path}/mozilla-headline/MozillaHeadline-SemiBold.woff2') format('woff2'),
-        url('#{$m24-font-path}/mozilla-headline/MozillaHeadline-SemiBold.woff') format('woff');
 }

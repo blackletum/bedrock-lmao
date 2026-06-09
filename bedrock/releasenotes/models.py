@@ -17,13 +17,14 @@ from django.http import Http404
 from django.utils.dateparse import parse_datetime
 from django.utils.functional import cached_property
 
-import bleach
 import markdown
 from django_extensions.db.fields.json import JSONField
 from markdown.extensions import Extension
 from markdown.inlinepatterns import InlineProcessor
+from product_details import product_details
 from product_details.version_compare import Version
 
+from bedrock.base.sanitization import sanitize_html
 from bedrock.base.urlresolvers import reverse
 from bedrock.releasenotes import version_re
 from bedrock.releasenotes.utils import memoize
@@ -54,52 +55,46 @@ markdowner = markdown.Markdown(
         StrikethroughExtension(),
     ]
 )
-# based on bleach.sanitizer.ALLOWED_TAGS
-ALLOWED_TAGS = {
-    "a",
-    "abbr",
-    "acronym",
-    "b",
-    "blockquote",
-    "br",
-    "code",
-    "div",
-    "del",
-    "em",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "hr",
-    "i",
-    "img",
-    "li",
-    "ol",
-    "p",
-    "small",
-    "strike",
-    "strong",
-    "ul",
+ALLOWED_TAGS = frozenset(
+    {
+        "a",
+        "abbr",
+        "acronym",
+        "b",
+        "blockquote",
+        "br",
+        "code",
+        "div",
+        "del",
+        "em",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "hr",
+        "i",
+        "img",
+        "li",
+        "ol",
+        "p",
+        "small",
+        "strike",
+        "strong",
+        "ul",
+    }
+)
+ALLOWED_ATTRS = {
+    "*": ["alt", "class", "height", "id", "rel", "title", "width"],
+    "a": ["href"],
+    "img": ["src", "srcset"],
 }
-ALLOWED_ATTRS = [
-    "alt",
-    "class",
-    "height",
-    "href",
-    "id",
-    "src",
-    "srcset",
-    "rel",
-    "title",
-    "width",
-]
 
 
 def process_markdown(value):
     rendered_html = markdowner.reset().convert(value)
-    return bleach.clean(rendered_html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
+    return sanitize_html(rendered_html, ALLOWED_TAGS, ALLOWED_ATTRS)
 
 
 def process_notes(notes):
@@ -166,6 +161,13 @@ class ProductReleaseQuerySet(models.QuerySet):
         if product_name.lower() == "firefox extended support release":
             product_name = "firefox"
             channel_name = "esr"
+
+        if channel_name == "esr":
+            # There may be several ESRs in existence at once, so make sure
+            # we get the version declared as the latest in the source of truth.
+            latest_esr = product_details.firefox_versions["FIREFOX_ESR"]
+            version = latest_esr.replace("esr", "")
+
         q = self.filter(product__iexact=product_name)
         if channel_name:
             q = q.filter(channel__iexact=channel_name)

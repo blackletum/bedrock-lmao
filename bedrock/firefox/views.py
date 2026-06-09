@@ -10,17 +10,14 @@ from urllib.parse import urlparse
 from django.conf import settings
 from django.http import Http404, HttpResponsePermanentRedirect, JsonResponse
 from django.utils.cache import patch_response_headers
-from django.utils.encoding import force_str
 from django.views.decorators.http import require_safe
 
-import querystringsafe_base64
 from product_details import product_details
 from product_details.version_compare import Version
 
 from bedrock.base.geo import get_country_from_request
 from bedrock.base.templatetags.helpers import urlparams
 from bedrock.base.urlresolvers import reverse
-from bedrock.contentful.api import ContentfulPage
 from bedrock.firefox.firefox_details import (
     firefox_android,
     firefox_desktop,
@@ -28,7 +25,7 @@ from bedrock.firefox.firefox_details import (
 )
 from bedrock.newsletter.forms import NewsletterFooterForm
 from bedrock.releasenotes import version_re
-from lib import l10n_utils
+from lib import l10n_utils, querystringsafe_base64
 from lib.l10n_utils import L10nTemplateView, get_translations_native_names
 from lib.l10n_utils.fluent import ftl, ftl_file_is_active
 
@@ -344,6 +341,9 @@ def firefox_all(request, product_slug=None, platform=None, locale=None):
                 # ESR115 builds do not exist for "sat" ans "skr" languages (see issue #15437).
                 if locale in ["sat", "skr"]:
                     download_esr_115_url = None
+                # ESR115 builds do not exist for "linux64-aarch64" platform (see issue mozmeao/springfield#467)
+                if platform == "linux64-aarch64":
+                    download_esr_115_url = None
                 context.update(
                     download_esr_115_url=download_esr_115_url,
                 )
@@ -444,10 +444,10 @@ class FirstrunView(L10nTemplateView):
 
     def get(self, *args, **kwargs):
         version = self.kwargs.get("version") or ""
-        new_page_url = urlparams(reverse("firefox.new"), reason="outdated")
+        new_page_url = urlparams(f"{settings.FXC_BASE_URL}/", reason="outdated")
         channel = detect_channel(version)
 
-        # redirect legacy /firstrun URLs to /firefox/new/
+        # redirect legacy /firstrun URLs to firefox.com
         if channel != "developer":
             return HttpResponsePermanentRedirect(new_page_url)
         elif channel == "developer" and not show_57_dev_firstrun(version):
@@ -482,6 +482,7 @@ class WhatsnewView(L10nTemplateView):
             "firefox/whatsnew/whatsnew",
         ],
         "firefox/whatsnew/index-thanks.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx142beta.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx130.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx131-na.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx131-eu.html": ["firefox/whatsnew/whatsnew"],
@@ -497,7 +498,6 @@ class WhatsnewView(L10nTemplateView):
         "firefox/whatsnew/whatsnew-fx133-donation.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx133-donation-eu.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx133-donation-na.html": ["firefox/whatsnew/whatsnew"],
-        "firefox/whatsnew/whatsnew-fx135beta.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx134-us.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx134-ca.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx134-gb.html": ["firefox/whatsnew/whatsnew"],
@@ -507,6 +507,17 @@ class WhatsnewView(L10nTemplateView):
         "firefox/whatsnew/whatsnew-fx135-na.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx136-eu-pip.html": ["firefox/whatsnew/whatsnew"],
         "firefox/whatsnew/whatsnew-fx136-na-pip.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx137-vertical-tabs.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx138-tab-groups.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx139-awesome-bar.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx140-productivity-shortcuts.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx141-customize-new-tab.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx142.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx142-tracking-protection-de-fr.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx143-row.html": ["firefox/whatsnew/whatsnew", "footer-refresh"],
+        "firefox/whatsnew/whatsnew-fx143-us.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx144.html": ["firefox/whatsnew/whatsnew"],
+        "firefox/whatsnew/whatsnew-fx146-donate.html": ["firefox/whatsnew/whatsnew-donate", "firefox/whatsnew/whatsnew"],
     }
 
     # specific templates that should not be rendered in
@@ -606,11 +617,70 @@ class WhatsnewView(L10nTemplateView):
             else:
                 template = "firefox/whatsnew/index.html"
         elif channel == "beta":
-            if version.startswith("135."):
+            if version.startswith("142."):
                 if locale.startswith("en-"):
-                    template = "firefox/whatsnew/whatsnew-fx135beta.html"
+                    template = "firefox/whatsnew/whatsnew-fx142beta.html"
                 else:
                     template = "firefox/whatsnew/index.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("146."):
+            if ftl_file_is_active("firefox/whatsnew/whatsnew-donate") and locale in [
+                "es-AR",
+                "es-CL",
+                "es-ES",
+                "es-MX",
+                "it",
+                "ja",
+                "pl",
+                "pt-PT",
+                "pt-BR",
+            ]:
+                template = "firefox/whatsnew/whatsnew-fx146-donate.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("144."):
+            if locale in ["en-US", "en-CA", "en-GB", "de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx144.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("143."):
+            if locale in ["en-CA", "en-GB", "de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx143-row.html"
+            elif locale in ["en-US"]:
+                template = "firefox/whatsnew/whatsnew-fx143-us.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("142."):
+            if locale in ["en-US", "en-CA", "en-GB"]:
+                template = "firefox/whatsnew/whatsnew-fx142.html"
+            elif locale in ["de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx142-tracking-protection-de-fr.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("141."):
+            if locale in ["en-US", "en-CA", "en-GB", "de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx141-customize-new-tab.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("140."):
+            if locale in ["en-US", "en-CA", "en-GB", "de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx140-productivity-shortcuts.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("139."):
+            if locale in ["en-US", "en-CA", "en-GB", "de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx139-awesome-bar.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("138."):
+            if locale in ["en-US", "en-CA", "en-GB", "de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx138-tab-groups.html"
+            else:
+                template = "firefox/whatsnew/index.html"
+        elif version.startswith("137."):
+            if locale in ["en-US", "en-CA", "en-GB", "de", "fr"]:
+                template = "firefox/whatsnew/whatsnew-fx137-vertical-tabs.html"
             else:
                 template = "firefox/whatsnew/index.html"
         elif version.startswith("136."):
@@ -749,71 +819,6 @@ class DownloadThanksView(L10nTemplateView):
         return [template]
 
 
-class NewView(L10nTemplateView):
-    ftl_files_map = {
-        "firefox/new/basic/base_download.html": ["firefox/new/download"],
-        "firefox/new/desktop/download.html": ["firefox/new/desktop"],
-    }
-    activation_files = [
-        "firefox/new/download",
-        "firefox/new/desktop",
-    ]
-
-    # place expected ?v= values in this list
-    variations = []
-
-    def get(self, *args, **kwargs):
-        # Remove legacy query parameters (Bug 1236791)
-        if self.request.GET.get("product", None) or self.request.GET.get("os", None):
-            return HttpResponsePermanentRedirect(reverse("firefox.new"))
-
-        scene = self.request.GET.get("scene", None)
-        if scene == "2":
-            # send to new permanent scene2 URL (bug 1438302)
-            thanks_url = reverse("firefox.download.thanks")
-            query_string = self.request.META.get("QUERY_STRING", "")
-            if query_string:
-                thanks_url = "?".join([thanks_url, force_str(query_string, errors="ignore")])
-            return HttpResponsePermanentRedirect(thanks_url)
-
-        return super().get(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-
-        # note: variation and xv params only allow a-z, A-Z, 0-9, -, and _ characters
-        variation = self.request.GET.get("variation", None)
-
-        # ensure variant matches pre-defined value
-        if variation not in self.variations:
-            variation = None
-
-        ctx["variation"] = variation
-
-        reason = self.request.GET.get("reason", None)
-        manual_update = True if reason == "manual-update" else False
-        outdated = reason == "outdated"
-        ctx["manual_update"] = manual_update
-        ctx["outdated"] = outdated
-
-        return ctx
-
-    def get_template_names(self):
-        variation = self.request.GET.get("variation", None)
-        experience = self.request.GET.get("xv", None)
-
-        # ensure variant matches pre-defined value
-        if variation not in self.variations:
-            variation = None
-
-        if ftl_file_is_active("firefox/new/desktop") and experience != "basic":
-            template = "firefox/new/desktop/download.html"
-        else:
-            template = "firefox/new/basic/base_download.html"
-
-        return [template]
-
-
 class PlatformViewLinux(L10nTemplateView):
     # the base_platform template works with either platform.ftl or download.ftl active
     template_name = "firefox/new/basic/download_linux.html"
@@ -870,11 +875,6 @@ def ios_testflight(request):
     return l10n_utils.render(request, "firefox/testflight.html", ctx)
 
 
-class FirefoxHomeView(L10nTemplateView):
-    ftl_files_map = {"firefox/index.html": ["firefox/browsers"]}
-    template_name = "firefox/index.html"
-
-
 BREACH_TIPS_URLS = {
     "de": "https://blog.mozilla.org/firefox/de/was-macht-man-nach-einem-datenleck/",
     "fr": "https://blog.mozilla.org/firefox/fr/que-faire-en-cas-de-fuite-de-donnees/",
@@ -905,8 +905,10 @@ def firefox_welcome_page1(request):
 @require_safe
 def firefox_features_translate(request):
     translate_langs = [
+        "ar",
         "bg",
         "ca",
+        "zh-CN",
         "hr",
         "cs",
         "da",
@@ -920,6 +922,8 @@ def firefox_features_translate(request):
         "hu",
         "id",
         "it",
+        "ja",
+        "ko",
         "lv",
         "lt",
         "pl",
@@ -1006,20 +1010,3 @@ class firefox_features_adblocker(L10nTemplateView):
             template_name = "firefox/features/adblocker.html"
 
         return [template_name]
-
-
-class FirefoxContentful(L10nTemplateView):
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        content_id = ctx["content_id"]
-        locale = l10n_utils.get_locale(self.request)
-        page = ContentfulPage(content_id, locale)
-        content = page.get_content()
-        self.request.page_info = content["info"]
-        ctx.update(content)
-        return ctx
-
-    def render_to_response(self, context, **response_kwargs):
-        template = "firefox/contentful-all.html"
-
-        return l10n_utils.render(self.request, template, context, **response_kwargs)

@@ -4,15 +4,12 @@
 
 @use 'sass:color';
 
-$font-path: '/media/protocol/fonts';
-$image-path: '/media/protocol/img';
-
-@import '~@mozilla-protocol/core/protocol/css/includes/lib';
-@import '~@mozilla-protocol/core/protocol/css/components/modal';
-@import '~@mozilla-protocol/core/protocol/css/components/sidebar-menu';
-@import '~@mozilla-protocol/core/protocol/css/includes/mixins/details';
-@import '~@mozilla-protocol/core/protocol/css/templates/main-with-sidebar';
-@import '../cms/rich-text';
+@use '~@mozilla-protocol/core/protocol/css/includes/lib' as * with ($font-path: '/media/protocol/fonts', $image-path: '/media/protocol/img');
+@use '~@mozilla-protocol/core/protocol/css/components/modal';
+@use '~@mozilla-protocol/core/protocol/css/components/sidebar-menu';
+@use '~@mozilla-protocol/core/protocol/css/includes/mixins/details';
+@use '~@mozilla-protocol/core/protocol/css/templates/main-with-sidebar';
+@use '../cms/rich-text';
 
 @font-face {
     font-family: FA-Icons-Contact;
@@ -59,6 +56,7 @@ $image-path: '/media/protocol/img';
     @include text-title-sm;
     margin: 1em 0;
     padding-top: 0.75em;
+    margin-bottom: $spacing-xs;
     border-top: 2px solid $color-marketing-gray-30;
 
     a {
@@ -82,7 +80,27 @@ $image-path: '/media/protocol/img';
     &.compact {
         border-bottom: 0;
         padding-bottom: 0;
-        margin-bottom: 0;
+        margin-bottom: $spacing-sm;
+    }
+}
+
+.leadership-description {
+    @include text-body-lg;
+    margin-top: 0;
+    margin-bottom: $spacing-lg;
+}
+
+.group-description {
+    @include text-body-md;
+    margin-top: 0;
+    margin-bottom: $spacing-md;
+}
+
+.leadership-section {
+    scroll-margin-top: $layout-sm;
+
+     @media #{$mq-md} {
+        scroll-margin-top: $layout-lg;
     }
 }
 
@@ -177,7 +195,7 @@ main .leadership-section:first-of-type .leadership-title:first-of-type {
         a.twitter::before { background-image: url('/media/protocol/img/icons/social/x/black.svg'); }
         a.mastodon::before { background-image: url('/media/protocol/img/icons/social/mastodon/black.svg'); }
         a.profile::before { background-image: url('/media/protocol/img/icons/accounts.svg'); }
-        a.file::before { background-image: url('/media/protocol/img/icons/file-image.svg'); }
+        a.file::before { background-image: url('/media/protocol/img/icons/download.svg'); }
         a.link::before { background-image: url('/media/protocol/img/icons/link.svg'); }
     }
 

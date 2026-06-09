@@ -6,7 +6,10 @@
 
 {% extends 'base-protocol-mozilla.html' %}
 
-{% block canonical_urls %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block canonical_urls %}
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="{{ settings.CANONICAL_URL + '/' + CANONICAL_LANG + canonical_path }}">
+{% endblock %}
 
 {% block body_class %}{{ super() }} monitor-waitlist{% endblock %}
 
@@ -44,7 +47,7 @@
         spinner_color='#0c99d5'
       ) }}
     {% else %}
-      <p class="c-not-available">
+      <p class="c-not-available" data-testid="waitlist-not-available">
         Sorry, this service is not currently available in your country.
       </p>
     {% endif %}

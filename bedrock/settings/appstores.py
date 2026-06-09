@@ -11,7 +11,9 @@ GOOGLE_PLAY_FIREFOX_LINK = "https://play.google.com/store/apps/details?id=org.mo
 # campaign parameters.
 # To clarify below, 'referrer' key value must be a URL encoded string of utm_*
 # key/values (https://bugzilla.mozilla.org/show_bug.cgi?id=1099429#c0).
-GOOGLE_PLAY_FIREFOX_LINK_UTMS = GOOGLE_PLAY_FIREFOX_LINK + "&referrer=" + quote("utm_source=mozilla&utm_medium=Referral&utm_campaign=mozilla-org")
+GOOGLE_PLAY_FIREFOX_LINK_UTMS = (
+    GOOGLE_PLAY_FIREFOX_LINK + "&referrer=" + quote("utm_source=www.mozilla.org&utm_medium=referral&utm_campaign=download")
+)
 
 # Link to Firefox for iOS on the Apple App Store.
 APPLE_APPSTORE_FIREFOX_LINK = "https://apps.apple.com/{country}/app/apple-store/id989804926"
@@ -87,12 +89,6 @@ APPLE_APPSTORE_KLAR_LINK = "https://apps.apple.com/{country}/app/apple-store/id1
 
 # Link to Firefox Klar on the Google Play store.
 GOOGLE_PLAY_KLAR_LINK = "https://play.google.com/store/apps/details?id=org.mozilla.klar"
-
-# Link to Pocket on the Apple App Store.
-APPLE_APPSTORE_POCKET_LINK = "https://apps.apple.com/{country}/app/apple-store/id309601447"
-
-# Link to Pocket on the Google Play store.
-GOOGLE_PLAY_POCKET_LINK = "https://play.google.com/store/apps/details?id=com.ideashower.readitlater.pro"
 
 # Link to Firefox Beta on the Google Play Store.
 GOOGLE_PLAY_FIREFOX_BETA_LINK = "https://play.google.com/store/apps/details?id=org.mozilla.firefox_beta"

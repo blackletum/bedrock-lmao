@@ -10,6 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.urls import NoReverseMatch
 from django.views.decorators.http import require_safe
 
+from bedrock.base.templatetags.helpers import urlparams
 from bedrock.base.urlresolvers import reverse
 from bedrock.firefox.firefox_details import firefox_desktop
 from bedrock.firefox.templatetags.helpers import android_builds, ios_builds
@@ -52,11 +53,11 @@ def get_download_url(release):
         return ios_builds(release.channel)[0]["download_link"]
     else:
         if release.channel == "Aurora":
-            return reverse("firefox.channel.desktop") + "#developer"
+            return reverse("firefox.channel.desktop", fragment="developer")
         elif release.channel == "Beta":
-            return reverse("firefox.channel.desktop") + "#beta"
+            return reverse("firefox.channel.desktop", fragment="beta")
         else:
-            return reverse("firefox")
+            return urlparams(f"{settings.FXC_BASE_URL}/", redirect_url="mozilla-org")
 
 
 def show_android_sys_req(version):

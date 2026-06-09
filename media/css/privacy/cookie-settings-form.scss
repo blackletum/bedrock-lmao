@@ -5,43 +5,9 @@
 @use '~@mozilla-protocol/core/protocol/css/includes/lib' as *;
 @use '~@mozilla-protocol/core/protocol/css/components/breadcrumb';
 
-// Temporary fix until https://github.com/mozilla/protocol/issues/933 is resolved
 .mzp-c-breadcrumb {
-    padding-top: $spacing-md;
-    padding-bottom: $spacing-md;
-
     &.is-hidden {
         display: none;
-    }
-
-    .mzp-c-breadcrumb-list {
-        max-width: 1440px;
-        margin: 0 auto;
-    }
-
-    .mzp-c-breadcrumb-item a {
-        &:link,
-        &:visited {
-            text-decoration: underline;
-        }
-
-        &:hover,
-        &:active,
-        &:focus {
-            text-decoration: none;
-        }
-    }
-
-    @media #{$mq-md} {
-        .mzp-c-breadcrumb-list {
-            padding: 8px 64px;
-        }
-    }
-
-    @media #{$mq-lg} {
-        .mzp-c-breadcrumb-list {
-            padding: 8px 96px;
-        }
     }
 }
 
@@ -77,7 +43,6 @@ main {
 
     .cookie-summary {
         border-bottom: 1px solid $color-light-gray-40;
-        cursor: pointer; // Temporary fix until https://github.com/mozilla/protocol/issues/948 is added
     }
 
     .cookie-summary-title {

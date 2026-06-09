@@ -8,6 +8,23 @@
 @import '~@mozilla-protocol/core/protocol/css/templates/main-with-sidebar';
 @import 'components/newsletter-form';
 
+.mzp-l-content.mzp-has-sidebar:has(> .mzp-l-sidebar:first-child) {
+    @media screen and (max-width: #{$screen-md - 1px}) {
+        padding-top: 0;
+    }
+}
+
+.mzp-c-sidemenu {
+    ul li,
+    .mzp-c-sidemenu-title {
+        font-family: #{$font-stack-mozilla-text};
+    }
+
+    p {
+        font-family: #{$font-stack-mozilla-text};
+    }
+}
+
 .c-article-meta-updated {
     @include text-display-xs;
 }
@@ -53,7 +70,7 @@ blockquote.t-small {
 
 .side-reference-title {
     @include text-body-lg;
-    font-family: var(--body-font-family);
+    font-family: #{$font-stack-mozilla-text};
 }
 
 .t-love {

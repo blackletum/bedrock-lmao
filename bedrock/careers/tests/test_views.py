@@ -9,11 +9,11 @@ from django.utils import timezone
 
 from bedrock.careers.forms import PositionFilterForm
 from bedrock.careers.tests import PositionFactory
-from bedrock.mozorg.tests import TestCase
+from bedrock.mozorg.tests import TransactionTestCase
 from bedrock.wordpress.models import BlogPost
 
 
-class PositionTests(TestCase):
+class PositionTests(TransactionTestCase):
     def test_context(self):
         response = self.client.get(reverse("careers.listings"), follow=True)
         self.assertEqual(response.status_code, 200)
@@ -43,12 +43,13 @@ class PositionTests(TestCase):
         url = reverse("careers.position", kwargs={"job_id": "aabbccdd", "source": "gh"})
         response = self.client.get(url, follow=True)
         self.assertEqual(response.status_code, 404)
-        self.assertTrue("<title>404: Job Not Found</title>" in str(response.content))
-        self.assertTrue(b"Sorry, we can\xe2\x80\x99t find that job posting" in response.content)
+        self.assertTrue("<title>404: Job Not Found</title>" in response.text)
+        self.assertTrue("Sorry, we can’t find that job posting" in response.text)
+
         self.assertTemplateUsed(response, "careers/404.html")
 
 
-class BlogTests(TestCase):
+class BlogTests(TransactionTestCase):
     blog_data = {
         "wp_blog_slug": "careers",
         "excerpt": "",

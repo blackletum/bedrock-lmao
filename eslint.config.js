@@ -84,7 +84,6 @@ module.exports = [
     eslintConfigPrettier,
     {
         ignores: [
-            'contentful_migrations/**/*.cjs',
             'docs/_build/**/*.js',
             'media/js/ie/libs/**/*.js',
             'media/js/libs/**/*.js',
@@ -107,7 +106,7 @@ module.exports = [
     {
         files: ['media/js/**/*.es6.js'],
         languageOptions: {
-            ecmaVersion: 2017,
+            ecmaVersion: 2018,
             sourceType: 'module',
             globals: {
                 ...customGlobals,

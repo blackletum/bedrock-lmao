@@ -19,18 +19,11 @@
 body {
     background-color: $m24-color-white;
     color: $m24-color-black;
-    font-family: var(--body-font-family);
-    font-variant-ligatures: none;
-    line-height: 1.2;
 }
 
 h1, h2, h3, h4, h5 {
     color: $m24-color-black;
-    font-family: var(--title-font-family);
-    font-variant-ligatures: none;
     font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.1;
 }
 
 strong {
@@ -38,14 +31,11 @@ strong {
 }
 
 a:link,
-a:visited {
+a:visited,
+a:hover,
+a:focus,
+a:active {
     color: $m24-color-black;
-
-    &:hover,
-    &:focus,
-    &:active {
-        color: $m24-color-black;
-    }
 }
 
 *:focus,
@@ -58,6 +48,11 @@ a:visited {
     @include container;
     padding-top: $spacer-xl;
     padding-bottom: $spacer-xl;
+    width: 100%;
+
+    &.padding-top-0 {
+        padding-top: 0;
+    }
 }
 
 /* ------------------------------------------------------------------------------- */
@@ -86,8 +81,7 @@ a:visited {
         text-decoration: none;
     }
 
-    &:link:hover,
-    &:link:hover:visited {
+    &:link:hover {
         --cta-bg-position: 0%;
         transition: $slow $bezier;
     }

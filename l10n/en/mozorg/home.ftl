@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-### URL: https://www-dev.allizom.org/ ('en-US', 'en-CA', 'en-GB', 'de' and 'fr' excluded)
+### URL: https://www-dev.allizom.org/?xv=quantum (old, old homepage)
 
 home-internet-for-people-not-profit = Internet for people, not profit
 home-did-you-know-mozilla-the-maker = Did you know? { -brand-name-mozilla } — the maker of { -brand-name-firefox } — fights to keep the internet a global public resource, open and accessible to all.
@@ -13,8 +13,6 @@ home-we-make-the-internet-safer = We make the internet safer, healthier and fast
 home-mozilla-is-the-not-for-profit = { -brand-name-mozilla } is the not-for-profit behind { -brand-name-firefox }, the original alternative browser. We create products and policy to keep the internet in service of people, not profit.
 home-our-impact = Our impact
 home-when-you-use-firefox-you-help = When you use { -brand-name-firefox }, you help { -brand-name-mozilla } fight misinformation online, teach digital skills and make the comments section more human. Check out what helps create a healthier internet.
-home-working-to-keep-the-internet = Working to keep the internet healthy, open and accessible to all, we teach web literacy, provide tools and advocate on behalf of every individual who values the internet as a global public resource.
-home-working-at-the-grassroots-and = Working at the grassroots and policy levels, we teach web literacy, provide tools and advocate on behalf of every individual who values an internet built on fairness, inclusion and respect.
 home-mozilla-information-trust-initiative = { -brand-name-mozilla } Information Trust Initiative
 home-empowering-women-online = Empowering Women Online
 home-the-coral-project = The Coral Project

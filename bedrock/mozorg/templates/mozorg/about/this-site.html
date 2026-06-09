@@ -9,7 +9,10 @@
 {% block page_title %}{{ ftl('about-this-site-title') }}{% endblock %}
 {% block page_desc %}{{ ftl('about-this-site-desc') }}{% endblock %}
 
-{% block canonical_urls %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block canonical_urls %}
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="{{ settings.CANONICAL_URL + '/' + CANONICAL_LANG + canonical_path }}">
+{% endblock %}
 
 {% block page_favicon %}{{ static('img/favicons/mozilla/dino/favicon.ico') }}{% endblock %}
 {% block page_favicon_large %}{{ static('img/favicons/mozilla/dino/favicon-196x196.png') }}{% endblock %}
@@ -33,8 +36,8 @@
     </p>
 
     <p>
-      {{ ftl('about-this-site-today',
-             firefox=url('firefox.new'),
+      {{ ftl('about-this-site-today-v2',
+             firefox="https://www.firefox.com/",
              vpn=url('products.vpn.landing'),
              mozilla=url('mozorg.about.index'),
              book=url('mozorg.book')) }}
@@ -64,7 +67,7 @@
         </a>
       </li>
       <li>
-        <a href="https://bedrock.readthedocs.io/">
+        <a href="https://mozilla.github.io/bedrock/">
           {{ ftl('about-this-site-read-the-docs') }}
         </a>
       </li>

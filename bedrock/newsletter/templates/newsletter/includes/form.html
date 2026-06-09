@@ -102,16 +102,26 @@
 
       <p class="mzp-c-form-submit">
         <button type="submit" id="newsletter-submit" class="mzp-c-button {{ button_class }}" data-cta-text="Newsletter Sign Up" data-testid="newsletter-submit-button">
+          <span class="submit-text">
           {% if submit_text %}
             {{ submit_text }}
           {% else %}
             {{ ftl('newsletter-form-sign-up-now', fallback='newsletter-form-sign-me-up') }}
           {% endif %}
+          </span>
+          <svg class="submit-loading" hidden fill="currentColor" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <title>{{ ftl('newsletter-form-submit-sending') }}</title>
+            <circle class="s1" cx="4" cy="12" r="3"/>
+            <circle class="s1 s2" cx="12" cy="12" r="3"/>
+            <circle class="s1 s3" cx="20" cy="12" r="3"/>
+          </svg>
         </button>
 
         {% if details %}
           <span class="mzp-c-fieldnote">{{ details }}</span>
-        {% elif not is_multi_newsletter_form %}
+        <!-- we could make this more configuration-driven by adding an extra param to the email_newsletter_form helper -->
+        <!-- complex condition used due to time constraint -->
+        {% elif not is_multi_newsletter_form and not id =='ten-tabs' %}
             <span class="mzp-c-fieldnote">
               {# Issue 7460 `mozilla-and-you` is the ID for the Firefox newsletter, because history... #}
               {% if id == 'mozilla-and-you' %}

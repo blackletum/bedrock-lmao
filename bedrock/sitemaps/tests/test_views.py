@@ -32,18 +32,18 @@ class TestSitemapView(TestCase):
             <?xml version="1.0" encoding="UTF-8"?>
             <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
               <sitemap>
-                <loc>https://www.mozilla.org/sitemap_none.xml</loc>
+                <loc>https://www.mozilla.org/all-urls-global.xml</loc>
               </sitemap>
               <sitemap>
-                <loc>https://www.mozilla.org/de/sitemap.xml</loc>
+                <loc>https://www.mozilla.org/de/all-urls.xml</loc>
               </sitemap>
               <sitemap>
-                <loc>https://www.mozilla.org/fr/sitemap.xml</loc>
+                <loc>https://www.mozilla.org/fr/all-urls.xml</loc>
               </sitemap>
             </sitemapindex>"""
         )
-        resp = self.client.get("/sitemap.xml")
-        assert resp.content.decode() == good_resp
+        resp = self.client.get("/all-urls.xml")
+        assert resp.text == good_resp
 
     def test_none(self):
         good_resp = dedent(
@@ -58,8 +58,8 @@ class TestSitemapView(TestCase):
               </url>
             </urlset>"""
         )
-        resp = self.client.get("/sitemap_none.xml")
-        assert resp.content.decode() == good_resp
+        resp = self.client.get("/all-urls-global.xml")
+        assert resp.text == good_resp
 
     def test_locales(self):
         good_resp = dedent(
@@ -74,8 +74,8 @@ class TestSitemapView(TestCase):
               </url>
             </urlset>"""
         )
-        resp = self.client.get("/de/sitemap.xml")
-        assert resp.content.decode() == good_resp
+        resp = self.client.get("/de/all-urls.xml")
+        assert resp.text == good_resp
 
         good_resp = dedent(
             """\
@@ -89,9 +89,9 @@ class TestSitemapView(TestCase):
               </url>
             </urlset>"""
         )
-        resp = self.client.get("/fr/sitemap.xml")
-        assert resp.content.decode() == good_resp
+        resp = self.client.get("/fr/all-urls.xml")
+        assert resp.text == good_resp
 
     def test_post(self):
-        resp = self.client.post("/en-US/sitemap.xml")
+        resp = self.client.post("/en-US/all-urls.xml")
         assert resp.status_code == 405

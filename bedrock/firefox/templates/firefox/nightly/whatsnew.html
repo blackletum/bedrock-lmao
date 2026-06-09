@@ -6,11 +6,13 @@
 
 {% extends "firefox/base/base-protocol.html" %}
 
-{# "noindex" pages should not have the canonical or hreflang tags: bug 1442331 #}
-{% block canonical_urls %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block canonical_urls %}
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="{{ settings.CANONICAL_URL + '/' + CANONICAL_LANG + canonical_path }}">
+{% endblock %}
 
 {% block site_css %}
-  {% if switch('m24-website-refresh') and ftl_file_is_active('navigation_refresh') and ftl_file_is_active('footer-refresh') %}
+  {% if ftl_file_is_active('navigation_refresh') and ftl_file_is_active('footer-refresh') %}
     {{ css_bundle('m24-root') }}
     {{ css_bundle('m24-navigation-and-footer') }}
   {% else %}
@@ -53,7 +55,7 @@
 
   <div class="mzp-l-content">
     <div class="mzp-c-emphasis-box">
-      <h2 class="c-emphasis-box-title">{{ self.page_title() }}</h2>
+      <h2 class="c-emphasis-box-title" data-testid="nightly-whatsnew-update-message">{{ self.page_title() }}</h2>
       {% if LANG == 'es-ES' and country_code == 'ES' %}
       <section class="mzp-c-callout  mzp-t-dark  mzp-t-content-xl mzp-l-content-xl">
           <div class="mzp-l-content">
@@ -72,7 +74,7 @@
 
       <p>{{ ftl('nightly-whatsnew-this-is-a-good') }}</p>
 
-      <p>{{ ftl('nightly-whatsnew-if-you-want-to-v4', blog='href="https://blog.nightly.mozilla.org/"', twitter='href="https://twitter.com/FirefoxNightly"', mastodon='href="https://mastodon.social/@FirefoxNightly"', bluesky='href="https://bsky.app/profile/firefoxnightly.bsky.social"', fallback='nightly-whatsnew-if-you-want-to-v3') }}</p>
+      <p>{{ ftl('nightly-whatsnew-if-you-want-to-v4', blog='href="https://blog.nightly.mozilla.org/"', twitter='href="https://twitter.com/FirefoxNightly"', mastodon='href="https://mastodon.social/@FirefoxNightly"', bluesky='href="https://bsky.app/profile/firefoxnightly.bsky.social"') }}</p>
 
       <p>
           {% set attrs = 'href="#" class="nightly-experiments-link"' %}

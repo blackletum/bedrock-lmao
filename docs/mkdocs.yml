@@ -1,0 +1,85 @@
+site_name: Bedrock Documentation
+site_url: https://mozilla.github.io/bedrock/
+
+copyright: "© Copyright 2011-2025, Mozilla"
+dev_addr: 127.0.0.1:8765
+
+repo_name: 'mozilla/bedrock'
+repo_url: 'https://github.com/mozilla/bedrock'
+edit_uri: edit/main/docs/docs/
+
+plugins:
+  - search
+
+theme:
+  name: material
+  logo: images/mozilla-logo.svg
+  favicon: images/favicon.png
+  icon:
+    repo: fontawesome/brands/github
+    admonition:
+      note: material/lightbulb
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      primary: black
+      accent: pink
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      primary: black
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - abbr
+  - def_list
+  - tables
+  - toc:
+      baselevel: 2
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.arithmatex
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      use_pygments: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md

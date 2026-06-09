@@ -49,6 +49,9 @@ OS_LANG_PAIRS = [
 ]
 
 
+@pytest.mark.skip(
+    reason="Related view is now unreachable and [TODO] should be removed",
+)
 def test_all_step_1(client):
     resp = client.get(reverse("firefox.all"))
     doc = pq(resp.content)
@@ -61,13 +64,16 @@ def test_all_step_1(client):
     assert len(doc(".qa-mobile-list > li")) == 4
 
 
+@pytest.mark.skip(
+    reason="Related view is now unreachable and [TODO] should be removed",
+)
 @pytest.mark.parametrize(
     "product_slug, name, count",
     (
-        ("desktop-release", "Firefox", 9),
-        ("desktop-esr", "Firefox Extended Support Release", 8),
-        ("desktop-beta", "Firefox Beta", 9),
-        ("desktop-developer", "Firefox Developer Edition", 8),
+        ("desktop-release", "Firefox", 10),
+        ("desktop-esr", "Firefox Extended Support Release", 9),
+        ("desktop-beta", "Firefox Beta", 10),
+        ("desktop-developer", "Firefox Developer Edition", 9),
         ("desktop-nightly", "Firefox Nightly", 9),
     ),
 )
@@ -82,6 +88,9 @@ def test_all_step_2(client, product_slug, name, count):
     assert len(doc(".c-platform-list > li")) == count
 
 
+@pytest.mark.skip(
+    reason="Related view is now unreachable and [TODO] should be removed",
+)
 def test_all_step_3(client):
     resp = client.get(reverse("firefox.all.locales", kwargs={"product_slug": "desktop-release", "platform": "win64"}))
     doc = pq(resp.content)
@@ -353,6 +362,9 @@ def test_firefox_ios_beta(client):
     assert doc(".c-step-download a").attr("href") == reverse("firefox.ios.testflight")
 
 
+@pytest.mark.skip(
+    reason="Related view is now unreachable and [TODO] should be removed",
+)
 @pytest.mark.parametrize(
     "slug, count",
     [

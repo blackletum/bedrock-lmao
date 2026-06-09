@@ -30,9 +30,10 @@ help:
 	@echo "  test                           - run tests against local files"
 	@echo "  test-image                     - run tests against files in docker image"
 	@echo "  test-cdn                       - run CDN tests against TEST_DOMAIN"
-	@echo "  docs                           - generate Sphinx HTML documentation with server and live reload using Docker"
-	@echo "  livedocs                       - generate Sphinx HTML documentation with server and live reload"
-	@echo "  build-docs                     - generate Sphinx HTML documentation using Docker"
+	@echo "  docs                           - generate mkdocs HTML documentation with server and live reload using Docker"
+	@echo "  docs-setup                     - install dependencies required for building the docs"
+	@echo "  livedocs                       - generate mkdocs HTML documentation with server and live reload"
+	@echo "  build-docs                     - generate mkdocs HTML documentation using Docker"
 	@echo "  build-ci                       - build docker images for use in our CI pipeline"
 	@echo "  test-ci                        - run tests against files in docker image built by CI"
 	@echo "  compile-requirements           - update Python requirements files using pip-compile"
@@ -122,7 +123,7 @@ test: .docker-build-pull
 	${DC} run --rm test
 
 test-cdn: .docker-build-pull test_infra/fixtures/tls.json
-	${DC} run test pytest --base-url https://${TEST_DOMAIN} test_infra
+	${DC} run test pytest --base-url https://${TEST_DOMAIN} -m cdn
 
 test-image: .docker-build
 	${DC} run test-image
@@ -131,10 +132,13 @@ docs: .docker-build-pull
 	${DC} up docs
 
 build-docs: .docker-build-pull
-	${DC} run app make -C docs/ clean html
+	${DC} run app make -C docs/ clean build
+
+docs-setup:
+	${MAKE} -C docs/ clean preflight
 
 livedocs:
-	${MAKE} -C docs/ clean livehtml
+	${MAKE} -C docs/ clean serve
 
 test_infra/fixtures/tls.json:
 	${DOCKER} run -it --rm jumanjiman/ssllabs-scan:latest --quiet https://${TEST_DOMAIN}/en-US/ > "test_infra/fixtures/tls.json"
@@ -174,7 +178,11 @@ check-requirements: .docker-build-pull
 
 preflight:
 	${MAKE} install-local-python-deps
-	@npm install
+	# --min-release-age=7 avoids packages uploaded in the last 7 days
+	# reducing supply-chain risk. Requires npm >= 11.10.0.
+	# To apply urgent security patch sooner, run:
+	# npm install package-name@version --min-release-age=0
+	@npm install --min-release-age=7
 	@$(if $(findstring --retain-db,$(MAKECMDGOALS)),bin/sync-all.sh --retain-db,bin/sync-all.sh)
 	@python manage.py bootstrap_local_admin
 
@@ -204,4 +212,4 @@ install-custom-git-hooks:
 uninstall-custom-git-hooks:
 	rm .git/hooks/post-merge
 
-.PHONY: all clean build pull docs livedocs build-docs lint run stop kill run-shell shell test test-image rebuild build-ci test-ci fresh-data djshell run-prod build-prod test-cdn compile-requirements check-requirements install-local-python-deps preflight clean-local-deps install-custom-git-hooks uninstall-custom-git-hooks run-local-task-queue
+.PHONY: all clean build pull docs docs-setup livedocs build-docs lint run stop kill run-shell shell test test-image rebuild build-ci test-ci fresh-data djshell run-prod build-prod test-cdn compile-requirements check-requirements install-local-python-deps preflight clean-local-deps install-custom-git-hooks uninstall-custom-git-hooks run-local-task-queue

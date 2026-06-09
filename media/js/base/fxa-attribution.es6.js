@@ -9,11 +9,13 @@ const FxaAttribution = {};
 const _allowedDomains = [
     'https://accounts.firefox.com/',
     'https://accounts.stage.mozaws.net/',
-    'https://monitor.mozilla.org/',
     'https://getpocket.com/',
-    'https://vpn.mozilla.org/',
+    'https://guardian-dev.herokuapp.com/',
+    'https://monitor.mozilla.org/',
+    'https://payments-next.allizom.org/',
+    'https://payments.firefox.com/',
     'https://stage.guardian.nonprod.cloudops.mozgcp.net/',
-    'https://guardian-dev.herokuapp.com/'
+    'https://vpn.mozilla.org/'
 ];
 
 const _allowedUtmParams = [

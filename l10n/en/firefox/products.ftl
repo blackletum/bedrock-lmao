@@ -55,16 +55,20 @@ firefox-products-thunderbird = { -brand-name-thunderbird }
 firefox-products-access-all = Access all your email, calendars, and contacts in one fast app. Filter and organize them the way you like.
 firefox-products-download-thunderbird = Download { -brand-name-thunderbird }
 
-## Fakespot
+## Solo
 
-firefox-products-fakespot = { -brand-name-fakespot }
-# scam artists are people who are trying to sell fakes or steal money
-# 'weeding' is a gardening term, here it is used to mean "removing unwanted things without touching the good ones"
-firefox-products-fakespot-has-your = { -brand-name-fakespot } has your back when you’re shopping online — weeding out scam artists and finding you the best deals. Made by { -brand-name-mozilla }.
-firefox-products-analyze = Analyze a URL
+firefox-products-solo = { -brand-name-solo }
+firefox-products-solo-desc = Instantly create a beautiful website so you can grow your business. Connect and host your custom domain for free.
+firefox-products-learn-more-about-solo = Learn more about { -brand-name-solo }
 
-## Pocket
+## 0DIN
 
-firefox-products-pocket = { -brand-name-pocket }
-firefox-products-discover-the-best-content-v2 = Discover the best content on the web — and consume it wherever and whenever you want. Made by { -brand-name-mozilla }.
-firefox-products-get-pocket = Get { -brand-name-pocket }
+firefox-products-0din = { -brand-name-0din }
+firefox-products-0din-desc = Connect your AI systems to a global community of security experts who uncover and help fix GenAI vulnerabilities early.
+firefox-products-learn-more-about-0din = Learn more about { -brand-name-0din }
+
+## Tabstack
+
+firefox-products-tabstack = { -brand-name-tabstack }
+firefox-products-tabstack-desc = Connect your apps to the web with reliable automation and turn live web pages into clean, structured results.
+firefox-products-learn-more-about-tabstack = Learn more about { -brand-name-tabstack }

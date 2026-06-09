@@ -2,7 +2,11 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+from django.conf import settings
+
 from .util import gone, redirect
+
+FXC_URL = settings.FXC_BASE_URL.strip("/") + "/"
 
 redirectpatterns = (
     # from org-urls-410.txt
@@ -600,11 +604,11 @@ redirectpatterns = (
     redirect(r"^docs/xul/xulnotes/xulnote_xml\.html$", "http://developer.mozilla.org/en/XUL_Genealogy:_XML"),
     redirect(r"^docs/xul/xulnotes/xulnote_xpconnect\.html$", "http://developer.mozilla.org/en/Fun_With_XBL_and_XPConnect"),
     redirect(r"^donate_faq\.html$", "https://wiki.mozilla.org/Donate"),
-    redirect(r"^donate_form\.pdf$", "https://foundation.mozilla.org/donate/"),
-    redirect(r"^donate\.html$", "https://foundation.mozilla.org/donate/"),
+    redirect(r"^donate_form\.pdf$", "https://www.mozillafoundation.org/donate/"),
+    redirect(r"^donate\.html$", "https://www.mozillafoundation.org/donate/"),
     redirect(r"^download-mozilla\.html$", "http://developer.mozilla.org/en/Download_Mozilla_Source_Code"),
     redirect(r"^feedback\.html$", "/contact/"),
-    redirect(r"^firebird$", "http://www.firefox.com"),
+    redirect(r"^firebird$", "https://www.firefox.com"),
     redirect(r"^get-involved\.html$", "/contribute/"),
     redirect(r"^foundation/mocosc/$", "/foundation/moco/"),
     redirect(r"^glimpsesearch\.html$", "https://dxr.mozilla.org/"),
@@ -950,7 +954,7 @@ redirectpatterns = (
     redirect(r"^products/thunderbird(/.*)?$", "/thunderbird/"),
     redirect(r"^profilemanager/isp-rdf-info\.txt$", "https://developer.mozilla.org/docs/Isp_Data"),
     redirect(r"^projects\.html$", "https://www.mozilla.org/projects/"),
-    redirect(r"^projects/browsers\.html$", "/firefox/new/"),
+    redirect(r"^projects/browsers\.html$", FXC_URL),
     redirect(r"^projects/bugzilla$", "https://www.bugzilla.org"),
     redirect(r"^projects/camino/damagedBookmarks\.html$", "http://wiki.caminobrowser.org/QA:Damaged_Bookmarks"),
     redirect(r"^projects/camino/development\.html$", "http://caminobrowser.org/contribute/"),

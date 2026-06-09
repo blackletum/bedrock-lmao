@@ -11,6 +11,7 @@ import jinja2
 from django_jinja import library
 from markupsafe import Markup
 
+from bedrock.base.waffle import switch
 from bedrock.newsletter.forms import NewsletterFooterForm
 from lib.l10n_utils import get_locale
 
@@ -39,10 +40,17 @@ def email_newsletter_form(
     email_label=None,
     email_placeholder=None,
     multi_opt_in_required=False,  # switches multi-newsletter forms to be opt-in rather than pre-checked.
+    template="newsletter/includes/form.html",
 ):
     request = ctx["request"]
     context = ctx.get_all()
-    action = settings.BASKET_SUBSCRIBE_URL
+    languages_override = None
+
+    if switch("foundation-separate-newsletter") and newsletters == "mozilla-foundation":
+        action = settings.FOUNDATION_SUBSCRIBE_URL
+        languages_override = settings.FOUNDATION_SUBSCRIBE_AVAILABLE_LANGUAGUES
+    else:
+        action = settings.BASKET_SUBSCRIBE_URL
 
     success = bool(ctx.get("success"))
     if success and not use_thankyou:
@@ -50,7 +58,12 @@ def email_newsletter_form(
 
     form = ctx.get("newsletter_form", None)
     if not form:
-        form = NewsletterFooterForm(newsletters, get_locale(request), multi_opt_in_required=multi_opt_in_required)
+        form = NewsletterFooterForm(
+            newsletters,
+            get_locale(request),
+            multi_opt_in_required=multi_opt_in_required,
+            languages_override=languages_override,
+        )
 
     if isinstance(newsletters, list):
         newsletters = ", ".join(newsletters)
@@ -83,5 +96,5 @@ def email_newsletter_form(
         )
     )
 
-    html = render_to_string("newsletter/includes/form.html", context, request=request)
+    html = render_to_string(template, context, request=request)
     return Markup(html)

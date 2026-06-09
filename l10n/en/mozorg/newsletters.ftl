@@ -60,6 +60,8 @@ newsletters-please-select-country = Please select a country or region
 # Form field error message
 newsletters-please-select-language = Please select a language
 
+newsletters-it-may-take = It may take up to an hour for newly subscribed information to be reflected on this page.
+
 # Variables:
 #   $url (url) - link to https://support.mozilla.org/kb/managing-account-data
 
@@ -72,6 +74,18 @@ newsletters-to-get-access-to-the-whole = To get access to the whole world of { -
 # Variables:
 #   $url (url) - link to https://www.mozilla.org/about/forums/
 newsletters-there-are-many-ways-to = There are many ways to engage with { -brand-name-mozilla } and { -brand-name-firefox }. If you didn’t find what you were looking for here, check out our <a href="{ $url }">community pages</a>.
+
+# Variables:
+#   $foundation (url) - link to https://www.mozillafoundation.org
+newsletters-newsletter-subscriptions-for = Newsletter subscriptions for <a href="{ $foundation }">{ -brand-name-mozilla-foundation }</a> are now managed separately.
+
+# Variables:
+#   $unsubscribe (url) - link to https://www.mozillafoundation.org/newsletter/unsubscribe
+newsletters-to-unsubscribe = To unsubscribe from a { -brand-name-mozilla-foundation } newsletter click here: <a href="{ $unsubscribe }">{ $unsubscribe }</a>.
+
+# Variables:
+#   $subscribe (url) - link to https://www.mozillafoundation.org/newsletter
+newsletters-if-you-arent-already-subscribed = If you aren’t already subscribed and would like to stay updated, click here: <a href="{ $subscribe }">{ $subscribe }</a>.
 
 # Variables:
 #   $newsletter (string) - newsletter name
@@ -225,12 +239,6 @@ newsletters-take-action = Take Action for the Internet
 
 # Description for the newsletter in Newsletter subscription page (Take Action for the Internet)
 newsletters-add-your-voice = Add your voice to petitions, events and initiatives that fight for the future of the web.
-
-# Name for the newsletter in Newsletter subscription page
-newsletters-new-product-testing = New Product Testing
-
-# Description for the newsletter in Newsletter subscription page (New Product Testing)
-newsletters-help-us-make-a-better-v2 = Help us make a better { -brand-name-mozilla } for you by test-driving our latest products and features.
 
 # Name for the newsletter in Newsletter subscription page
 newsletters-mozilla-community = { -brand-name-mozilla } Community

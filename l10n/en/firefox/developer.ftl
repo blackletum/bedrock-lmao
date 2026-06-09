@@ -57,21 +57,13 @@ firefox-developer-firefox-devtools-now-grays-out = { -brand-name-firefox-devtool
 firefox-developer-firefox-devtools = { -brand-name-firefox-devtools }
 firefox-developer-the-new-firefox-devtools = The new { -brand-name-firefox-devtools } are powerful, flexible, and best of all, hackable. This includes a best-in-class JavaScript debugger, which can target multiple browsers and is built in React and Redux.
 firefox-developer-master-css-grid = Master CSS Grid
-firefox-developer-built-for-developers = Built for Developers
 firefox-developer-master-innovative-features = Innovative Features
-firefox-developer-want-to-be-on-the-cutting-edge = Want to be on the cutting-edge?
-firefox-developer-firefox-nightly-receives = { -brand-name-firefox-nightly } receives daily updates and allows you to access features months before they go mainstream.
 firefox-developer-firefox-is-the-only-browser = { -brand-name-firefox } is the only browser with tools built specifically for building and designing with CSS Grid. These tools allow you to visualize the grid, display associated area names, preview transformations on the grid and much more.
-firefox-developer-convenient-features = Convenient Features
-firefox-developer-shapes-editor = Shapes Editor
-firefox-developer-firefox-devtools-has-a-brand-new-v2 = { -brand-name-firefox-devtools } has a brand new shape path editor that takes the guesswork out of fine-tuning your shape-outside and clip-path shapes by allowing you to very easily fine-tune your adjustments with a visual editor.
-firefox-developer-firefox-devtools-has-a-brand-new = { -brand-name-firefox-devtools } has a brand new shape path editor that takes the guesswork out of fine-tuning your shadow-outside and clip-path shapes by allowing you to very easily fine-tune your adjustments with a visual editor.
 firefox-developer-faster-innovation = Faster Information
 firefox-developer-fonts-panel = Fonts Panel
 firefox-developer-the-new-fonts-panel = The new fonts panel in { -brand-name-firefox-devtools } gives developers quick access to all of the information they need about the fonts being used in an element. It also includes valuable information such as the font source, weight, style and more.
 firefox-developer-firefox-developer-edition-sends = { -brand-name-firefox-developer-edition } automatically sends feedback to { -brand-name-mozilla }.
 firefox-developer-download-the-firefox-browser = Download the { -brand-name-firefox } browser made for developers
-firefox-developer-firefox-has-been-rebuilt = { -brand-name-firefox } has been rebuilt from the ground-up to be faster, sleeker, and more powerful than ever.
 firefox-developer-welcome-to-firefox-developer-edition = Welcome to { -brand-name-firefox-developer-edition }
 
 firefox-developer-made-for-developers = The browser made for developers
@@ -92,15 +84,3 @@ firefox-developer-mdn-blog = { -brand-name-mdn } Blog
 firefox-developer-mdn-unlock-the-world = Unlock the world of web development with the { -brand-name-mdn } Blog — your go-to hub for expert insights, latest web standards, and coding tips.
 firefox-developer-mdn-updates = Updates
 firefox-developer-mdn-the-web-doesnt-have = The web doesn’t have a changelog, but { -brand-name-mdn } can help. You can personalize and filter compatibility changes based on browsers or the tech category you are interested in whether that is JavaScript, CSS, etc.
-# Obsolete string (expires 18-04-2025)
-firefox-developer-mdn-references = { -brand-name-mdn } References
-# Obsolete string (expires 18-04-2025)
-firefox-developer-mdn-is-a = { -brand-name-mdn } is an open-source, collaborative project documenting web platform technologies, including CSS, HTML, JavaScript and web APIs.
-# Obsolete string (expires 18-04-2025)
-firefox-developer-mdn-curriculum = { -brand-name-mdn } Curriculum
-# Obsolete string (expires 18-04-2025)
-firefox-developer-a-structured-guide = A structured guide to the essential skills and practices for being a successful front-end developer, along with recommended learning resources.
-# Obsolete string (expires 18-04-2025)
-firefox-developer-mdn-plus = { -brand-name-mdn-plus }
-# Obsolete string (expires 18-04-2025)
-firefox-developer-support-mdn-and = Support { -brand-name-mdn } and make it your own with collections, notifications, and playgrounds.

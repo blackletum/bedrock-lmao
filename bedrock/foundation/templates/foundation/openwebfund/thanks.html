@@ -6,8 +6,10 @@
 
 {% extends "foundation/base.html" %}
 
-{# "noindex" pages should not have the canonical or hreflang tags: bug 1442331 #}
-{% block canonical_urls %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block canonical_urls %}
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="{{ settings.CANONICAL_URL + '/' + CANONICAL_LANG + canonical_path }}">
+{% endblock %}
 
 {% block page_title %}Thank you{% endblock %}
 
@@ -25,7 +27,7 @@
   <ul class="mzp-u-list-styled">
     <li><a href="http://www.drumbeat.org/people">Join</a> Mozilla Drumbeat and start making the web more open and awesome right now</li>
     <li><a href="{{ url('mozorg.contribute') }}">Get involved</a> with Mozilla</li>
-    <li>Introduce someone to <a href="{{ url('firefox.new') }}">Mozilla Firefox</a></li>
+    <li>Introduce someone to <a href="https://www.firefox.com/">Mozilla Firefox</a></li>
   </ul>
 
 {% endblock %}

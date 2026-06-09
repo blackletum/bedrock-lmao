@@ -9,7 +9,10 @@
 {% block page_title %}{{ ftl('data-preferences-page-title') }}{% endblock %}
 {% block page_desc %}{{ ftl('data-preferences-page-desc') }}{% endblock %}
 
-{% block canonical_urls %}<meta name="robots" content="noindex,follow">{% endblock %}
+{% block canonical_urls %}
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="{{ settings.CANONICAL_URL + '/' + CANONICAL_LANG + canonical_path }}">
+{% endblock %}
 
 {% block page_css %}
   {{ css_bundle('protocol-article') }}
@@ -42,14 +45,14 @@
       {{ ftl('data-preferences-if-you-still-want-to') }}
     </p>
 
-    <p id="data-preference-status" class="data-preference-status">
+    <p id="data-preference-status" class="data-preference-status" data-testid="data-preference-status">
       <strong>{{ ftl('data-preferences-current-preference') }}</strong>
       <noscript>{{ ftl('data-preferences-please-enable-javascript') }}</noscript>
       <span class="data-preference-text"></span>
     </p>
 
     <p>
-      <button type="button" class="mzp-c-button js-opt-out-button" aria-controls="data-preference-status">
+      <button type="button" class="mzp-c-button js-opt-out-button" aria-controls="data-preference-status" data-testid="button-opt-out">
         {{ ftl('data-preferences-opt-out-button') }}
       </button>
     </p>
@@ -57,7 +60,7 @@
     <p>{{ ftl('data-preferences-if-you-change') }}</p>
 
     <p>
-      <button type="button" class="mzp-c-button js-opt-in-button" aria-controls="data-preference-status">
+      <button type="button" class="mzp-c-button js-opt-in-button" aria-controls="data-preference-status" data-testid="button-opt-in">
         {{ ftl('data-preferences-opt-in-button') }}
       </button>
     </p>

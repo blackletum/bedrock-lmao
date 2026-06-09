@@ -10,6 +10,8 @@
   <head>
     <meta charset="utf-8">{# Note: Must be within first 512 bytes of page #}
 
+    {% include 'includes/transcend-consent.html' %}
+
     <!--[if !IE]><!-->
     {{ js_bundle('site') }}
 
@@ -55,8 +57,6 @@
     {# keep the verification for the previous official mastodon profile #}
     <link href="https://mastodon.social/@mozilla" rel="me">
 
-    {{ l10n_css() }}
-
     <!--[if lt IE 9]>
       {# Only needed for IE before v9 #}
       <script src="{{ static('js/ie/libs/html5shiv.js') }}"></script>
@@ -72,16 +72,13 @@
     <!--[if !IE]><!-->
     {# Global styles, hidden from IE9 and lower #}
     {% block site_css %}
-      {% if switch('m24-website-refresh') %}
-        {{ css_bundle('protocol-mozilla-2024') }}
-        {% if ftl_file_is_active('navigation_refresh') and ftl_file_is_active('footer-refresh') %}
-          {{ css_bundle('m24-navigation-and-footer') }}
-        {% else %}
-          {{ css_bundle('legacy-navigation-and-footer') }}
-        {% endif %}
+      {{ css_bundle('protocol-mozilla') }}
+      {% if ftl_file_is_active('navigation_refresh') and ftl_file_is_active('footer-refresh') %}
+        {{ css_bundle('m24-navigation-and-footer') }}
       {% else %}
-        {{ css_bundle('protocol-firefox') }}
+        {{ css_bundle('legacy-navigation-and-footer') }}
       {% endif %}
+      {{ l10n_css() }}
     {% endblock %}
 
     {# Page-specific styles, hidden from IE9 and lower #}
@@ -144,7 +141,7 @@
         {{ js_bundle('lib') }}
         {{ js_bundle('fxa') }}
         {{ js_bundle('data') }}
-        {% if switch('m24-website-refresh') and ftl_file_is_active('navigation_refresh') and ftl_file_is_active('footer-refresh') %}
+        {% if ftl_file_is_active('navigation_refresh') and ftl_file_is_active('footer-refresh') %}
           {{ js_bundle('m24-ui') }}
         {% else %}
           {{ js_bundle('ui') }}

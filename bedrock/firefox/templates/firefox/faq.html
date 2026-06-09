@@ -22,8 +22,8 @@
     {{ sub_nav(
       title={
         'text':  ftl('sub-navigation-firefox'),
-        'href':  url('firefox'),
-        'icon':  static('protocol/img/logos/firefox/logo.svg'),
+        'href':  "https://www.firefox.com/?redirect_source=mozilla-org",
+        'icon':  static('protocol/img/logos/firefox/browser/logo.svg'),
         'cta_name': 'Firefox'
       },
       links=[
@@ -68,20 +68,14 @@
     <ul class="faq-list">
       <li>
         <h2>{{ ftl('what-is-firefox') }}</h2>
-        {% if switch('firefox-tou') %}
-          <p>{{ ftl('the-firefox-browser-the-only',
-            url=url('firefox'),
-            url2=url('products.landing')) }}</p>
-        {% else %}
-          <p>{{ ftl('the-firefox-browser',
-            url=url('firefox'),
-            url2=url('products.landing')) }}</p>
-        {% endif %}
+        <p>{{ ftl('the-firefox-browser-the-only',
+          url="https://www.firefox.com/?redirect_source=mozilla-org",
+          url2=url('products.landing')) }}</p>
       </li>
       <li>
         <h2>{{ ftl('how-do-i') }}</h2>
         <p>{{ ftl('you-can-easily',
-              url=url('firefox.new'),
+              url="https://www.firefox.com/?redirect_source=mozilla-org",
               url2=url('firefox.windows'),
               url3=url('firefox.mac'),
               url4=url('firefox.linux'),
@@ -90,11 +84,7 @@
       </li>
       <li>
         <h2>{{ ftl('is-firefox-free') }}</h2>
-        {% if switch('firefox-tou') %}
-          <p>{{ ftl('yep-the-firefox-browser-is-free') }}</p>
-        {% else %}
-          <p>{{ ftl('yep-the-firefox') }}</p>
-        {% endif %}
+        <p>{{ ftl('yep-the-firefox-browser-is-free') }}</p>
         <small>{{ ftl('related-questions-free') }}</small>
       </li>
       <li>
@@ -105,19 +95,13 @@
       </li>
       <li>
         <h2>{{ ftl('is-firefox-safe-download') }}</h2>
-        <p>{{ ftl('protecting-your-privacy', url=url('firefox.new')) }}</p>
+        <p>{{ ftl('protecting-your-privacy', url="https://www.firefox.com/?redirect_source=mozilla-org") }}</p>
       </li>
       <li>
         <h2>{{ ftl('is-firefox-safe') }}</h2>
         <p>{{ ftl('not-only-is', url=url('firefox.features.private')) }}</p>
         <small>{{ ftl('related-questions-safe') }}</small>
       </li>
-      {% if not switch('firefox-tou') %}
-        <li>
-          <h2>{{ ftl('does-firefox-sell') }}</h2>
-          <p>{{ ftl('nope-never-have', url=url('privacy')) }}</p>
-        </li>
-      {% endif %}
       <li>
         <h2>{{ ftl('why-is-firefox') }}</h2>
         <p>{{ ftl('firefox-isnt-slow') }}</p>
@@ -141,7 +125,7 @@
       {% endif %}
       <li>
         <h2>{{ ftl('who-owns-firefox') }}</h2>
-        <p>{{ ftl('firefox-is-made', url='https://foundation.mozilla.org/?utm_source=www.mozilla.org-firefox-faq&amp;utm_medium=referral&amp;utm_campaign=seo', url2=url('foundation.moco')) }}</p>
+        <p>{{ ftl('firefox-is-made', url='https://www.mozillafoundation.org/?utm_source=www.mozilla.org-firefox-faq&amp;utm_medium=referral&amp;utm_campaign=seo', url2=url('foundation.moco')) }}</p>
         <small>{{ ftl('related-questions-who') }}</small>
       </li>
     </ul>
