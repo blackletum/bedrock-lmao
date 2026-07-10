@@ -301,6 +301,7 @@ redirectpatterns = (
     # bug 861243 and bug 869489
     redirect(r"^about/manifesto\.html$", "/about/manifesto/"),
     redirect(r"^about/manifesto\.(.*)\.html$", "/{}/about/manifesto/", locale_prefix=False),
+    redirect(r"^about/manifesto/details/?$", "mozorg.about.manifesto"),
     # bug 856077
     redirect(r"^projects/toolkit/?$", "https://developer.mozilla.org/docs/Toolkit_API"),
     redirect(r"^rhino/download\.html$", "https://developer.mozilla.org/docs/Mozilla/Projects/Rhino/Download_Rhino"),
@@ -533,7 +534,6 @@ redirectpatterns = (
     redirect(r"^/en/$", "/en-US/", permanent=True),
     # Issue 13554
     redirect(r"^about/leadership/senior-leadership/$", "/about/leadership/#senior"),
-    redirect(r"^about/leadership/mozilla-foundation/$", "/about/leadership/#foundation"),
     redirect(r"^about/leadership/reps-council/$", "/about/leadership/#reps"),
     redirect(r"^about/leadership/boards-of-directors/$", "/about/leadership/#boards"),
     # Issue 13672

@@ -19,44 +19,6 @@ pytestmark = [
 
 
 @pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
-def test_leadership_page(minimal_site, rf, serving_method):  # noqa
-    root_page = minimal_site.root_page
-
-    leadership_page = factories.LeadershipPageFactory(
-        parent=root_page,
-        leadership_sections__0__section__title="Test Section Title",
-        leadership_sections__0__section__leadership_group__0__title="Test Leadership Group Title",
-        leadership_sections__0__section__leadership_group__0__leaders__0__name="Test Name",
-        leadership_sections__0__section__leadership_group__0__leaders__0__headshot=factories.LeadershipHeadshotBlockFactory(
-            image_alt_text="Text Alt Text",
-            photos_link="https://example.com/photos.zip",
-        ),
-        leadership_sections__0__section__leadership_group__0__leaders__0__job_title="Test Job Title",
-        leadership_sections__0__section__leadership_group__0__leaders__0__biography=RichText("Test Biography"),
-        leadership_sections__0__section__leadership_group__0__leaders__0__external_links__0__url="https://example.com",
-        leadership_sections__0__section__leadership_group__0__leaders__0__external_links__0__type="Website",
-        leadership_sections__0__section__leadership_group__0__leaders__0__external_links__0__text="Test Blog link",
-    )
-
-    leadership_page.save()
-
-    _relative_url = leadership_page.relative_url(minimal_site)
-    assert _relative_url == "/en-US/leadership/"  # Note: not the real site URL just for testing.
-    request = rf.get(_relative_url)
-
-    resp = getattr(leadership_page, serving_method)(request)
-    page_content = resp.text
-    assert "Test Section Title" in page_content
-    assert "Test Leadership Group" in page_content
-    assert "Test Name" in page_content
-    assert 'alt="Text Alt Text"' in page_content
-    assert "Test Blog link" and 'href="https://example.com"' in page_content
-    assert 'href="https://example.com/photos.zip"' in page_content
-    assert "Test Job Title" in page_content
-    assert "Test Biography" in page_content
-
-
-@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
 def test_advertising_index_page(minimal_site, rf, serving_method):  # noqa
     root_page = minimal_site.root_page
 
@@ -480,7 +442,7 @@ def test_about_us_page_utm_parameters(minimal_site):  # noqa: F811
 
 
 def test_about_us_page_subpage_types():
-    assert models.LeadershipPage in models.AboutUsPage.subpage_types
+    assert models.OrganizationLeadershipIndexPage in models.AboutUsPage.subpage_types
 
 
 def test_notification_snippet_analytics_id_auto_generated():
@@ -497,3 +459,259 @@ def test_notification_snippet_analytics_id_not_overwritten():
     snippet.notification_text = "<p>Updated</p>"
     snippet.save()
     assert snippet.analytics_id == original_uuid
+
+
+# LeadershipProfileSnippet tests
+
+
+def test_leadership_profile_snippet_str():
+    snippet = factories.LeadershipProfileSnippetFactory(name="Jane Doe")
+    assert str(snippet) == "Jane Doe"
+
+
+# OrganizationLeadershipIndexPage / OrganizationLeadershipSubpage tests
+
+
+def test_organization_leadership_page_subpage_types():
+    assert models.OrganizationLeadershipIndexPage in models.AboutUsPage.subpage_types
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_index_page(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    snippet = factories.LeadershipProfileSnippetFactory(
+        name="Test Executive",
+        press_photos_link="https://example.com/exec-photos.zip",
+    )
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(
+        parent=root_page,
+        exec_heading="Executive Leadership",
+        exec_description="<p>Our executive team.</p>",
+        exec_leaders=[("leadership_profile", {"profile": snippet, "job_title": "Chief Executive Officer"})],
+        sub_pages_link_heading="Our Organizations",
+    )
+    index_page.save()
+
+    _relative_url = index_page.relative_url(minimal_site)
+    assert _relative_url == "/en-US/organization-leadership/"
+    request = rf.get(_relative_url)
+
+    resp = getattr(index_page, serving_method)(request)
+    assert resp.status_code == 200
+    page_content = resp.text
+
+    assert "Executive Leadership" in page_content
+    assert "Our executive team." in page_content
+    assert "Test Executive" in page_content
+    assert "Chief Executive Officer" in page_content
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_index_page_shows_child_pages(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    snippet = factories.LeadershipProfileSnippetFactory(name="Test Person")
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(
+        parent=root_page,
+        sub_pages_link_heading="Our Organizations",
+        sub_pages_link_description="Learn about the organizations that make up Mozilla.",
+    )
+    index_page.save()
+
+    subpage = factories.OrganizationLeadershipSubpageFactory(
+        parent=index_page,
+        title="Test Suborganization",
+        leadership_groups=[
+            (
+                "group",
+                {
+                    "title": "Test Group",
+                    "description": "Test group description.",
+                    "leaders": [{"profile": snippet, "job_title": "Test Role"}],
+                },
+            )
+        ],
+    )
+    subpage.save()
+
+    _relative_url = index_page.relative_url(minimal_site)
+    request = rf.get(_relative_url)
+
+    resp = getattr(index_page, serving_method)(request)
+    assert resp.status_code == 200
+    page_content = resp.text
+
+    assert "Test Suborganization" in page_content
+    assert "Our Organizations" in page_content
+    assert "Learn about the organizations that make up Mozilla." in page_content
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_index_page_description_hidden_without_heading(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(
+        parent=root_page,
+        sub_pages_link_heading="",
+        sub_pages_link_description="This description should not appear.",
+    )
+    index_page.save()
+
+    factories.OrganizationLeadershipSubpageFactory(parent=index_page).save()
+
+    _relative_url = index_page.relative_url(minimal_site)
+    request = rf.get(_relative_url)
+
+    resp = getattr(index_page, serving_method)(request)
+    assert resp.status_code == 200
+    assert "This description should not appear." not in resp.text
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_index_page_exec_closing(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(
+        parent=root_page,
+        exec_closing="<p>Thank you for your continued support.</p>",
+    )
+    index_page.save()
+
+    _relative_url = index_page.relative_url(minimal_site)
+    request = rf.get(_relative_url)
+
+    resp = getattr(index_page, serving_method)(request)
+    assert resp.status_code == 200
+    page_content = resp.text
+    assert "Thank you for your continued support." in page_content
+    assert "c-group-closing" in page_content
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_index_page_exec_closing_hidden_when_blank(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(
+        parent=root_page,
+        exec_closing="",
+    )
+    index_page.save()
+
+    _relative_url = index_page.relative_url(minimal_site)
+    request = rf.get(_relative_url)
+
+    resp = getattr(index_page, serving_method)(request)
+    assert resp.status_code == 200
+    assert "c-group-closing" not in resp.text
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_subpage(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    snippet = factories.LeadershipProfileSnippetFactory(
+        name="Test Leader",
+        press_photos_link="https://example.com/leader-photos.zip",
+    )
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(parent=root_page)
+    index_page.save()
+
+    subpage = factories.OrganizationLeadershipSubpageFactory(
+        parent=index_page,
+        description="Test organization description.",
+        leadership_groups=[
+            (
+                "group",
+                {
+                    "title": "Senior Leadership",
+                    "description": "Our senior leadership team.",
+                    "leaders": [{"profile": snippet, "job_title": "Vice President"}],
+                },
+            )
+        ],
+    )
+    subpage.save()
+
+    _relative_url = subpage.relative_url(minimal_site)
+    assert _relative_url == "/en-US/organization-leadership/org-subpage/"
+    request = rf.get(_relative_url)
+
+    resp = getattr(subpage, serving_method)(request)
+    assert resp.status_code == 200
+    page_content = resp.text
+
+    assert "Test organization description." in page_content
+    assert "Senior Leadership" in page_content
+    assert "Our senior leadership team." in page_content
+    assert "Test Leader" in page_content
+    assert "Vice President" in page_content
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_subpage_group_closing(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    snippet = factories.LeadershipProfileSnippetFactory(name="Test Leader")
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(parent=root_page)
+    index_page.save()
+
+    subpage = factories.OrganizationLeadershipSubpageFactory(
+        parent=index_page,
+        leadership_groups=[
+            (
+                "group",
+                {
+                    "title": "Senior Leadership",
+                    "description": "Our senior leadership team.",
+                    "leaders": [{"profile": snippet, "job_title": "Vice President"}],
+                    "closing": "<p>Thank you for your dedication.</p>",
+                },
+            )
+        ],
+    )
+    subpage.save()
+
+    _relative_url = subpage.relative_url(minimal_site)
+    request = rf.get(_relative_url)
+
+    resp = getattr(subpage, serving_method)(request)
+    assert resp.status_code == 200
+    page_content = resp.text
+    assert "Thank you for your dedication." in page_content
+    assert "c-group-closing" in page_content
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_organization_leadership_subpage_group_closing_hidden_when_blank(minimal_site, rf, serving_method):  # noqa: F811
+    root_page = minimal_site.root_page
+
+    snippet = factories.LeadershipProfileSnippetFactory(name="Test Leader")
+
+    index_page = factories.OrganizationLeadershipIndexPageFactory(parent=root_page)
+    index_page.save()
+
+    subpage = factories.OrganizationLeadershipSubpageFactory(
+        parent=index_page,
+        leadership_groups=[
+            (
+                "group",
+                {
+                    "title": "Senior Leadership",
+                    "leaders": [{"profile": snippet, "job_title": "Vice President"}],
+                },
+            )
+        ],
+    )
+    subpage.save()
+
+    _relative_url = subpage.relative_url(minimal_site)
+    request = rf.get(_relative_url)
+
+    resp = getattr(subpage, serving_method)(request)
+    assert resp.status_code == 200
+    assert "c-group-closing" not in resp.text

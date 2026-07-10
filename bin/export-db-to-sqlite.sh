@@ -171,7 +171,9 @@ python manage.py dumpdata \
     anonym.AnonymContactPage \
     anonym.Person \
     mozorg.WebvisionDoc \
-    mozorg.LeadershipPage \
+    mozorg.LeadershipProfileSnippet \
+    mozorg.OrganizationLeadershipIndexPage \
+    mozorg.OrganizationLeadershipSubpage \
     mozorg.AdvertisingIndexPage \
     mozorg.AdvertisingTwoColumnSubpage \
     mozorg.ContentSubpage \
@@ -190,7 +192,6 @@ python manage.py dumpdata \
     security.Product \
     security.SecurityAdvisory \
     security.HallOfFamer \
-    releasenotes.ProductRelease \
     contentcards.ContentCard \
     utils.GitRepoState \
     wordpress.BlogPost \

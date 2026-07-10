@@ -38,12 +38,6 @@
     },
     {
       "files": [
-        "css/firefox/system-requirements.scss"
-      ],
-      "name": "firefox_system_requirements"
-    },
-    {
-      "files": [
         "css/firefox/installer-help.scss"
       ],
       "name": "installer_help"
@@ -59,12 +53,6 @@
         "css/mozorg/mpl-differences.scss"
       ],
       "name": "mpl-differences"
-    },
-    {
-      "files": [
-        "css/firefox/releases-index.scss"
-      ],
-      "name": "firefox_releases_index"
     },
     {
       "files": [
@@ -190,12 +178,6 @@
     },
     {
       "files": [
-        "css/mozorg/manifesto.scss"
-      ],
-      "name": "manifesto"
-    },
-    {
-      "files": [
         "css/firefox/features/picture-in-picture.scss"
       ],
       "name": "firefox-features-pip"
@@ -206,12 +188,6 @@
         "css/mozorg/home/home-new.scss"
       ],
       "name": "home-new"
-    },
-    {
-      "files": [
-        "css/base/banners/firefox-newsletter.scss"
-      ],
-      "name": "firefox-newsletter-banner"
     },
     {
       "files": [
@@ -656,12 +632,6 @@
     },
     {
       "files": [
-        "css/firefox/releasenotes.scss"
-      ],
-      "name": "firefox_releasenotes"
-    },
-    {
-      "files": [
         "css/newsletter/newsletter-firefox.scss"
       ],
       "name": "newsletter-firefox"
@@ -692,9 +662,15 @@
     },
     {
       "files": [
-        "css/mozorg/leadership.scss"
+        "css/mozorg/org-leadership.scss"
       ],
-      "name": "about-leadership"
+      "name": "about-org-leadership"
+    },
+    {
+      "files": [
+        "css/mozorg/m24-manifesto.scss"
+      ],
+      "name": "m24-manifesto"
     },
     {
       "files": [
@@ -1195,12 +1171,6 @@
     },
     {
       "files": [
-        "css/firefox/whatsnew/whatsnew-146-donate.scss"
-      ],
-      "name": "firefox_whatsnew_146_donate"
-    },
-    {
-      "files": [
         "css/base/banners/fundraising-banner.scss"
       ],
       "name": "fundraising-banner"
@@ -1622,12 +1592,6 @@
     },
     {
       "files": [
-        "js/mozorg/manifesto.js"
-      ],
-      "name": "manifesto"
-    },
-    {
-      "files": [
         "js/libs/classlist.js",
         "js/libs/array-from.js",
         "js/base/search-params.js",
@@ -1671,13 +1635,6 @@
         "js/base/protocol/init-m24-navigation.es6.js"
       ],
       "name": "m24-ui"
-    },
-    {
-      "files": [
-        "js/base/banners/firefox-newsletter-banner-init.es6.js",
-        "js/base/banners/firefox-newsletter-banner-check.js"
-      ],
-      "name": "firefox-newsletter-banner"
     },
     {
       "files": [

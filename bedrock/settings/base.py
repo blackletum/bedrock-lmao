@@ -130,8 +130,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-USE_ETAGS = config("USE_ETAGS", default=str(not DEBUG), parser=bool)
-
 # Use the "X-Forwarded-Host" header from the CDN to set the Hostname
 # https://mozilla-hub.atlassian.net/browse/SE-4263
 USE_X_FORWARDED_HOST = config("USE_X_FORWARDED_HOST", default="False", parser=bool)
@@ -778,7 +776,6 @@ INSTALLED_APPS = [
     "bedrock.products",
     "bedrock.externalfiles",
     "bedrock.security",
-    "bedrock.releasenotes",
     "bedrock.contentcards",
     "bedrock.utils",
     "bedrock.wordpress",
@@ -1071,10 +1068,6 @@ CONTENT_CARDS_REPO = config("CONTENT_CARDS_REPO", default="https://github.com/mo
 CONTENT_CARDS_BRANCH = config("CONTENT_CARDS_BRANCH", default=content_cards_default_branch)
 CONTENT_CARDS_URL = config("CONTENT_CARDS_URL", default=STATIC_URL)
 
-RELEASE_NOTES_PATH = config("RELEASE_NOTES_PATH", default=data_path("release_notes"))
-RELEASE_NOTES_REPO = config("RELEASE_NOTES_REPO", default="https://github.com/mozilla/release-notes.git")
-RELEASE_NOTES_BRANCH = config("RELEASE_NOTES_BRANCH", default="master")
-
 LEGAL_DOCS_PATH = DATA_PATH / "legal_docs"
 LEGAL_DOCS_REPO = config("LEGAL_DOCS_REPO", default="https://github.com/mozilla/legal-docs.git")
 LEGAL_DOCS_BRANCH = config("LEGAL_DOCS_BRANCH", default="main" if DEV else "prod")
@@ -1087,9 +1080,12 @@ WEBVISION_DOCS_BRANCH = config("WEBVISION_DOCS_BRANCH", default="main")
 MOFO_SECURITY_ADVISORIES_PATH = config("MOFO_SECURITY_ADVISORIES_PATH", default=data_path("mofo_security_advisories"))
 MOFO_SECURITY_ADVISORIES_REPO = config(
     "MOFO_SECURITY_ADVISORIES_REPO",
-    default="https://github.com/mozilla/foundation-security-advisories.git",
+    default="https://github.com/mozilla/foundation-security-advisories-private.git",
 )
-MOFO_SECURITY_ADVISORIES_BRANCH = config("MOFO_SECURITY_ADVISORIES_BRANCH", default="master")
+MOFO_SECURITY_ADVISORIES_BRANCH = config("MOFO_SECURITY_ADVISORIES_BRANCH", default="main")
+# "<github username>:<github token>" (or just "<github token>") used to authenticate
+# git clone/fetch against the advisories repo when it is private. Empty = no auth.
+MOFO_SECURITY_ADVISORIES_AUTH = config("MOFO_SECURITY_ADVISORIES_AUTH", default="")
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r"^/([a-zA-Z-]+/)?(newsletter)/"
@@ -1176,7 +1172,21 @@ SENTRY_DSN = config("SENTRY_DSN", default="")
 # https://github.com/laiyongtao/sentry-processor
 SENSITIVE_FIELDS_TO_MASK_ENTIRELY = [
     "email",
-    # "token",  # token is on the default blocklist, which we also use via `with_default_keys`
+    # Belt-and-braces: these names are also on `with_default_keys=True`'s
+    # blocklist, but listing them here explicitly guards against SDK / processor
+    # version drift removing a name from the default set, and documents the
+    # local-variable names that touch credentials in this codebase.
+    "token",
+    "auth",
+    "pat",
+    # `git_config_value` is a substring of GIT_CONFIG_VALUE_0/_1/... — the env
+    # keys we use in bedrock/utils/git.py to pass an http.extraheader containing
+    # a base64-encoded PAT to git. On a clone/fetch failure those keys end up in
+    # frame locals (env, kwargs) which Sentry captures with with_locals=True.
+    # The default blocklist names don't substring-match the GIT_CONFIG_VALUE_*
+    # keys, so without this entry the encoded credential would survive into the
+    # Sentry payload.
+    "git_config_value",
 ]
 SENTRY_IGNORE_ERRORS = (
     BrokenPipeError,
@@ -1284,7 +1294,7 @@ DATA_CONSENT_COUNTRIES = [
 # ***This URL *MUST* end in a traling slash!***
 VPN_ENDPOINT = config(
     "VPN_ENDPOINT",
-    default=("https://stage.guardian.nonprod.cloudops.mozgcp.net/" if DEV else "https://vpn.mozilla.org/"),
+    default=("https://stage.vpn.nonprod.webservices.mozgcp.net/" if DEV else "https://vpn.mozilla.org/"),
 )
 
 # URL for Mozilla VPN subscription links
@@ -2759,7 +2769,9 @@ _allowed_page_models = [
     "anonym.AnonymContactPage",
     "mozorg.HomePage",
     "mozorg.AboutUsPage",
-    "mozorg.LeadershipPage",
+    "mozorg.LeadershipProfileSnippet",
+    "mozorg.OrganizationLeadershipIndexPage",
+    "mozorg.OrganizationLeadershipSubpage",
     "products.VPNResourceCenterDetailPage",
     "products.VPNResourceCenterIndexPage",
     "products.MonitorArticleIndexPage",

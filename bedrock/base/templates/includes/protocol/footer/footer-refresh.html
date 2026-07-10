@@ -37,6 +37,7 @@
               <li><a href="{{ url('mozorg.about.leadership.index') }}" data-link-position="footer" data-link-text="Leadership">{{ ftl('footer-refresh-leadership') }}</a></li>
               <li><a href="https://blog.mozilla.org/category/mozilla/news/?{{ utm_params }}&utm_content=company" data-link-position="footer" data-link-text="Press Center">{{ ftl('footer-refresh-press-center') }}</a></li>
               <li><a href="{{ url('careers.home') }}" data-link-position="footer" data-link-text="Careers">{{ ftl('footer-refresh-careers') }}</a></li>
+              <li><a href="https://shop.mozilla.com/?{{ utm_params }}&utm_content=company" data-link-position="footer" data-link-text="Merch Store">{{ ftl('footer-refresh-store') }}</a></li>
               <li><a href="{{ url('mozorg.contact.contact-landing') }}" data-link-position="footer" data-link-text="Contact">{{ ftl('footer-refresh-contact') }}</a></li>
             {% if LANG == "de" %}
               {# Legal requirement in Germany see issue #14240 #}
@@ -108,9 +109,13 @@
     <div class="moz24-footer-secondary">
       <div class="moz24-footer-legal">
         <p class="moz24-footer-license" rel="license">
-          {% set moco_link = 'href="%s" data-link-position="footer" data-link-text="Mozilla Corporation"'|safe|format(url('mozorg.home')) %}
           {% set mofo_link = 'href="https://www.mozillafoundation.org/?utm_source=www.mozilla.org&utm_medium=referral&utm_campaign=footer" rel="external noopener" data-link-position="footer" data-link-text="Mozilla Foundation"'|safe %}
-          {{ ftl('footer-refresh-visit-mozilla-corporations-v2', moco_link=moco_link, mofo_link=mofo_link) }}<br>
+          {% if ftl_has_messages('footer-refresh-donate-not-for-profit') %}
+            {{ ftl('footer-refresh-donate-not-for-profit', mofo_link=mofo_link) }}<br>
+          {% else %}
+            {% set moco_link = 'href="%s" data-link-position="footer" data-link-text="Mozilla Corporation"'|safe|format(url('mozorg.home')) %}
+            {{ ftl('footer-refresh-visit-mozilla-corporations-v2', moco_link=moco_link, mofo_link=mofo_link) }}<br>
+          {% endif %}
           {{ ftl('footer-refresh-portions-of-this-content', href='href="%s"'|safe|format(url('foundation.licensing.website-content')), current_year=current_year|string) }}
         </p>
         <ul class="moz24-footer-terms">
