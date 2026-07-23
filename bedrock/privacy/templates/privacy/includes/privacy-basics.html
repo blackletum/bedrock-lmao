@@ -1,0 +1,195 @@
+{#
+ This Source Code Form is subject to the terms of the Mozilla Public
+ License, v. 2.0. If a copy of the MPL was not distributed with this
+ file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#}
+
+
+<section id="basics" aria-label="{{ ftl('privacy-firefox-basics') }}">
+  {% call split(
+    image=picture(
+      url='img/privacy/firefox/hero-wide-high-res.jpg',
+      sources=[
+        {
+          'media': '(max-width: 767px)',
+          "srcset" : {
+            "img/privacy/firefox/hero-wide.jpg": "600w",
+            "img/privacy/firefox/hero-wide-high-res.jpg": "1200w",
+          },
+          'width' : '600',
+          'height' : '337'
+        },
+        {
+          'media': '(min-width: 767px) and (max-width: 1200px)',
+          'srcset': {
+            "img/privacy/firefox/hero-tall.jpg": "600w",
+            "img/privacy/firefox/hero-tall-high-res.jpg": "1200w",
+          },
+          'width' : '415',
+          'height' : '233'
+        },
+        {
+          'media': '(min-width: 1200px)',
+          "srcset" : {
+            "img/privacy/firefox/hero-wide.jpg": "600w",
+            "img/privacy/firefox/hero-wide-high-res.jpg": "1200w",
+          },
+          'width' : '600',
+          'height' : '337'
+        },
+      ],
+      optional_attributes={
+        "loading": "lazy",
+        "alt": "",
+        "aria-hidden": "true"
+      }
+    ),
+    ) %}
+      {{ title|safe }}
+      <p class="c-subtitle">{{ ftl('privacy-firefox-youre-in-control') }}</p>
+      <p>{{ ftl('privacy-firefox-privacy-isnt-just') }}</p>
+      <p>
+        <a href="#notice" class="mzp-c-button mzp-t-secondary">
+        {{ ftl('privacy-firefox-read-our-privacy') }}
+        <span class="mzp-c-button-icon-end" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#010101" d="M4.74 2.4zm8.48 7.88v.01c0-4.36-3.8-7.9-8.48-7.9v2.38a6.14 6.14 0 0 1 6.1 5.51s0 .01 0 .01v-.01H2.56l9.47 11.27 9.47-11.27h-8.29Zm-1.19 7.57-4.35-5.17h8.7l-4.35 5.17Z"/></svg>
+        </span>
+        </a>
+    </p>
+  {% endcall %}
+
+  <section class="t-alt">
+    <div class="mzp-l-content">
+
+      <div class="mzp-c-section-heading">
+        <h2>{{ ftl('privacy-firefox-keeping-you-informed') }}</h2>
+        <p>{{ ftl('privacy-firefox-we-believe-you') }}</p>
+      </div>
+
+      <ul class="mzp-l-columns mzp-t-columns-two mzp-t-picto-side">
+        {% call picto(
+          base_el='li',
+          title=ftl('privacy-firefox-transparency-first'),
+          image=resp_img(
+            url='img/privacy/firefox/transparency.svg',
+            optional_attributes={
+              'class': 'mzp-c-picto-image',
+              'loading': 'lazy',
+              'width' : 124,
+              'height': 124,
+              'alt': '',
+              'aria-hidden': 'true'
+            }
+          ),
+          body=True,
+        ) %}
+            {{ ftl('privacy-firefox-were-clear-about', attrs='href="#notice"') }}
+        {% endcall %}
+
+        {% call picto(
+          base_el='li',
+          title=ftl('privacy-firefox-how-we-use'),
+          image=resp_img(
+            url='img/privacy/firefox/data.svg',
+            optional_attributes={
+              'class': 'mzp-c-picto-image',
+              'loading': 'lazy',
+              'width' : 124,
+              'height': 124,
+              'alt': '',
+              'aria-hidden': 'true'
+            }
+          ),
+          body=True,
+        ) %}
+            {{ ftl('privacy-firefox-we-use-data') }}
+        {% endcall %}
+
+        {% call picto(
+          base_el='li',
+          title=ftl('privacy-firefox-builtin-control'),
+          image=resp_img(
+            url='img/privacy/firefox/control.svg',
+            optional_attributes={
+              'class': 'mzp-c-picto-image',
+              'loading': 'lazy',
+              'width' : 124,
+              'height': 124,
+              'alt': '',
+              'aria-hidden': 'true'
+            }
+          ),
+          body=True,
+        ) %}
+            {{ ftl('privacy-firefox-firefox-gives-you') }}
+        {% endcall %}
+
+        {% call picto(
+          base_el='li',
+          title=ftl('privacy-firefox-always-protected'),
+          image=resp_img(
+            url='img/privacy/firefox/protected.svg',
+            optional_attributes={
+              'class': 'mzp-c-picto-image',
+              'loading': 'lazy',
+              'width' : 124,
+              'height': 124,
+              'alt': '',
+              'aria-hidden': 'true'
+            }
+          ),
+          body=True,
+        ) %}
+            {{ ftl('privacy-firefox-firefox-protects-you') }}
+        {% endcall %}
+      </ul>
+    </div>
+  </section>
+
+  {% call split(
+    block_class='mzp-l-split-reversed c-settings',
+    image=picture(
+      url='img/privacy/firefox/settings-wide.svg',
+      sources=[
+        {
+          'media': '(max-width: 767px)',
+          "srcset" : {
+            "img/privacy/firefox/settings-wide.svg": "680w",
+          },
+          'width' : '680',
+          'height' : '383'
+        },
+        {
+          'media': '(min-width: 767px) and (max-width: 1200px)',
+          'srcset': {
+            "img/privacy/firefox/settings-tall.svg": "680w",
+          },
+          'width' : '415',
+          'height' : '233'
+        },
+        {
+          'media': '(min-width: 1200px)',
+          "srcset" : {
+            "img/privacy/firefox/settings-wide.svg": "680w",
+          },
+          'width' : '680',
+          'height' : '383'
+        },
+      ],
+      optional_attributes={
+        "loading": "lazy",
+        "alt": "",
+        "aria-hidden": "true"
+      }
+    ),
+    ) %}
+      <h2>{{ ftl('privacy-firefox-privacy-that-works') }}</h2>
+      <p>{{ ftl('privacy-firefox-firefox-makes-it') }}</p>
+      <div class="c-settings-buttons">
+        <p class="c-settings-manage"><strong>{{ ftl('privacy-firefox-manage-your-privacy') }}</strong></p>
+        <a class="mzp-c-button mzp-t-secondary" href="https://support.mozilla.org/kb/manage-firefox-data-collection-privacy-settings">{{ ftl('privacy-firefox-firefox-for-desktop-v2') }}</a>
+        <a class="mzp-c-button mzp-t-secondary" href="https://support.mozilla.org/kb/mobile-manage-firefox-data-collection-and-privacy">{{ ftl('privacy-firefox-firefox-for-mobile-v2') }}</a>
+      </div>
+  {% endcall %}
+
+</section>

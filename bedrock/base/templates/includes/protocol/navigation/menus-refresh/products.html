@@ -8,14 +8,14 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 <li class="m24-c-menu-category mzp-has-drop-down mzp-js-expandable">
   <a class="m24-c-menu-title" href="{{ url('products.landing') }}" aria-haspopup="true" aria-controls="m24-c-menu-panel-products" data-testid="m24-navigation-link-products">{{ ftl('navigation-refresh-products') }}</a>
-  <div class="m24-c-menu-panel" id="m24-c-menu-panel-products" data-testid="m24-navigation-menu-products">
-    <div class="m24-c-menu-panel-container">
+  <div class="m24-c-menu-panel" id="m24-c-menu-panel-products" data-testid="m24-navigation-panel-products">
+    <div class="m24-c-menu-panel-container" data-testid="m24-navigation-menu-products">
       <button class="m24-c-menu-button-close" type="button" aria-controls="m24-c-menu-panel-products">{{ ftl('navigation-refresh-close-products-menu') }}</button>
       <div class="m24-c-menu-panel-content">
         <ul class="m24-mzp-l-content">
           <li>
             <section class="m24-c-menu-item mzp-has-icon">
-              <a class="m24-c-menu-item-link" href="{{ url('products.vpn.landing') }}" data-link-text="Mozilla VPN" data-link-position="topnav - products">
+              <a class="m24-c-menu-item-link" href="{{ url('products.vpn.landing') }}" data-link-text="Mozilla VPN" data-link-position="topnav - products" data-testid="m24-navigation-menu-link-products-vpn">
                 <img loading="lazy" src="{{ static('protocol/img/logos/mozilla/vpn/logo.svg') }}" class="m24-c-menu-item-icon" width="32" height="32" alt="">
                 <h2 class="m24-c-menu-item-title">{{ ftl('navigation-refresh-mozilla-vpn-v2') }}</h2>
               </a>
@@ -23,7 +23,12 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
           </li>
           <li>
             <section class="m24-c-menu-item mzp-has-icon">
-              <a class="m24-c-menu-item-link" href="https://monitor.mozilla.org/?{{ utm_params }}" data-link-text="Mozilla Monitor" data-link-position="topnav - products">
+              {% if LANG.startswith('en-') %}
+                {% set monitor_link = url('products.monitor.landing') %}
+              {% else %}
+                {% set monitor_link = "https://monitor.mozilla.org/?" + utm_params %}
+              {% endif %}
+              <a class="m24-c-menu-item-link" href="{{ monitor_link }}" data-link-text="Mozilla Monitor" data-link-position="topnav - products">
                 <img loading="lazy" src="{{ static('protocol/img/logos/firefox/monitor/logo.svg') }}" class="m24-c-menu-item-icon" width="32" height="32" alt="">
                 <h2 class="m24-c-menu-item-title">{{ ftl('navigation-refresh-mozilla-monitor-v2') }}</h2>
               </a>
@@ -32,7 +37,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
           <li>
             <section class="m24-c-menu-item mzp-has-icon">
               <a class="m24-c-menu-item-link" href="https://relay.firefox.com/?{{ utm_params }}" data-link-text="Firefox Relay" data-link-position="topnav - products">
-                <img loading="lazy" src="{{ static('protocol/img/logos/firefox/relay/logo-white.svg') }}" class="m24-c-menu-item-icon" width="32" height="32" alt="">
+                <img loading="lazy" src="{{ static('protocol/img/logos/firefox/relay/logo.svg') }}" class="m24-c-menu-item-icon" width="32" height="32" alt="">
                 <h2 class="m24-c-menu-item-title">{{ ftl('navigation-refresh-firefox-relay') }}</h2>
               </a>
             </section>
@@ -50,15 +55,6 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
               <a class="m24-c-menu-item-link" href="https://developer.mozilla.org/plus?{{ utm_params }}" data-link-text="MDN Plus" data-link-position="topnav - products">
                 <img loading="lazy" src="{{ static('img/logos/mdn/mdn-plus-logo.svg') }}" class="m24-c-menu-item-icon" width="32" height="32" alt="">
                 <h2 class="m24-c-menu-item-title">{{ ftl('navigation-refresh-mdn-plus') }}</h2>
-              </a>
-            </section>
-          </li>
-          <li>
-            <section class="m24-c-menu-item mzp-has-icon">
-              <a class="m24-c-menu-item-link" href="https://fakespot.com/?{{ utm_params }}" data-link-text="Fakespot" data-link-position="topnav - products" aria-labelledby="fakespot-aria-hint">
-                <img loading="lazy" src="{{ static('img/logos/fakespot/logo-blue.svg') }}" class="m24-c-menu-item-icon" width="32" height="32" alt="">
-                <h2 class="m24-c-menu-item-title" aria-labelledby="fakespot-aria-hint">{{ ftl('navigation-refresh-fakespot') }}</h2>
-                <span id="fakespot-aria-hint" aria-label="fake spot"></span>
               </a>
             </section>
           </li>

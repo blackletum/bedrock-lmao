@@ -86,7 +86,7 @@ if REDIS_URL:
         "image_renditions": {"URL": f"{REDIS_URL}/0"},
     }
 
-CACHE_TIME_SHORT = 60 * 10  # 10 mins
+CACHE_TIME_SHORT = config("CACHE_TIME_SHORT", parser=int, default=f"{60 * 10}")  # 10 mins
 CACHE_TIME_MED = 60 * 60  # 1 hour
 CACHE_TIME_LONG = 60 * 60 * 6  # 6 hours
 
@@ -131,10 +131,6 @@ TIME_ZONE = config("TIME_ZONE", default="America/Los_Angeles")
 # to load the internationalization machinery.
 USE_I18N = True
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
-USE_L10N = True
-
 USE_TZ = True
 
 USE_ETAGS = config("USE_ETAGS", default=str(not DEBUG), parser=bool)
@@ -170,11 +166,13 @@ LOCALES_BY_REGION = {
     "Americas": ["azz", "cak", "en-CA", "en-US", "es-AR", "es-CL", "es-MX", "gn", "is", "pt-BR", "trs"],
     "Asia Pacific": [
         "bn",
+        "gu-IN",
         "hi-IN",
         "id",
         "ja",
         "kk",
         "km",
+        "kn",
         "ko",
         "lo",
         "ml",
@@ -186,6 +184,7 @@ LOCALES_BY_REGION = {
         "si",
         "ta",
         "te",
+        "tg",
         "th",
         "tl",
         "ur",
@@ -249,7 +248,7 @@ LOCALES_BY_REGION = {
         "uk",
         "uz",
     ],
-    "Middle East and Africa": ["ach", "af", "ar", "az", "fa", "ff", "gu-IN", "he", "kab", "kn", "skr", "son", "xh"],
+    "Middle East and Africa": ["ach", "af", "ar", "az", "fa", "ff", "he", "kab", "skr", "son", "xh"],
 }
 
 
@@ -263,13 +262,10 @@ def _put_default_lang_first(langs, default_lang=LANGUAGE_CODE):
 # Our accepted production locales are the values from the above, plus an exception.
 PROD_LANGUAGES = _put_default_lang_first(sorted(sum(LOCALES_BY_REGION.values(), [])) + ["ja-JP-mac"])
 
-GITHUB_REPO = "https://github.com/mozilla/bedrock"
-
 # Global L10n files.
 FLUENT_DEFAULT_FILES = [
     "banners/consent-banner",
     "banners/firefox-app-store",
-    "banners/m24-pencil-banner",
     "brands",
     "download_button",
     "footer",
@@ -306,29 +302,6 @@ FLUENT_PATHS = [
     FLUENT_LOCAL_PATH,
     # remote FTL files from l10n team
     FLUENT_REPO_PATH,
-]
-
-# Templates to exclude from having an "edit this page" link in the footer
-# these are typically ones for which most of the content is in the DB
-EXCLUDE_EDIT_TEMPLATES = [
-    "firefox/releases/nightly-notes.html",
-    "firefox/releases/dev-browser-notes.html",
-    "firefox/releases/esr-notes.html",
-    "firefox/releases/beta-notes.html",
-    "firefox/releases/aurora-notes.html",
-    "firefox/releases/release-notes.html",
-    "firefox/releases/notes.html",
-    "firefox/releases/system_requirements.html",
-    "mozorg/credits.html",
-    "mozorg/about/forums.html",
-    "security/advisory.html",
-    "security/advisories.html",
-    "security/product-advisories.html",
-    "security/known-vulnerabilities.html",
-]
-# Also allow entire directories to be skipped
-EXCLUDE_EDIT_TEMPLATES_DIRECTORIES = [
-    "cms",
 ]
 
 IGNORE_LANG_DIRS = [
@@ -482,8 +455,8 @@ SUPPORTED_NONLOCALES = [
 # Paths that can exist either with or without a locale code in the URL.
 # Matches the whole URL path
 SUPPORTED_LOCALE_IGNORE = [
-    "/sitemap_none.xml",  # in sitemap urls
-    "/sitemap.xml",  # in sitemap urls
+    "/all-urls-global.xml",  # in sitemap urls
+    "/all-urls.xml",  # in sitemap urls
 ]
 # Pages that we don't want to be indexed by search engines.
 # Only impacts sitemap generator. If you need to disallow indexing of
@@ -535,25 +508,29 @@ EXTRA_INDEX_URLS = {
     "/about/legal/impressum/": ["de"],
 }
 
-SITEMAPS_REPO = config("SITEMAPS_REPO", default="https://github.com/mozmeao/www-sitemap-generator.git")
-SITEMAPS_REPO_BRANCH = config("SITEMAPS_REPO_BRANCH", default="master")
-SITEMAPS_PATH = DATA_PATH / "sitemaps"
-
 # Pages that have different URLs for different locales, e.g.
 #   'firefox/private-browsing/': {
 #       'en-US': '/firefox/features/private-browsing/',
 #   },
 ALT_CANONICAL_PATHS = {}
 
-ALLOWED_HOSTS = config(
-    "ALLOWED_HOSTS",
-    parser=ListOf(str, allow_empty=False),
-    default="www.mozilla.org,www.ipv6.mozilla.org,www.allizom.org",
-)
-ALLOWED_CIDR_NETS = config(
-    "ALLOWED_CIDR_NETS",
-    parser=ListOf(str, allow_empty=False),
-    default="",
+# NOTE:
+# - In the infra config a pod IP is prepended with a trailing comma
+# - In some environments, there might be no additional content after this comma
+# - The `allow_empty=True` ensures the split operation works even when nothing follows the comma
+# - We then use `filter()` to remove any resulting empty strings from the list
+ALLOWED_HOSTS = list(
+    filter(
+        None,
+        config(
+            "ALLOWED_HOSTS",
+            parser=ListOf(
+                str,
+                allow_empty=True,
+            ),
+            default="",
+        ),
+    )
 )
 
 # The canonical, production URL without a trailing slash
@@ -692,7 +669,6 @@ ENABLE_METRICS_VIEW_TIMING_MIDDLEWARE = config("ENABLE_METRICS_VIEW_TIMING_MIDDL
 
 MIDDLEWARE = [
     # IMPORTANT: this may be extended later in this file or via settings/__init__.py
-    "allow_cidr.middleware.AllowCIDRMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "bedrock.mozorg.middleware.HostnameMiddleware",
@@ -949,20 +925,6 @@ CDN_BASE_URL = config("CDN_BASE_URL", default="")
 
 DONATE_LINK = "https://foundation.mozilla.org/{location}"
 
-# Official Firefox Twitter accounts
-FIREFOX_TWITTER_ACCOUNTS = {
-    "en-US": "https://twitter.com/firefox",
-    "es-ES": "https://twitter.com/firefox_es",
-    "pt-BR": "https://twitter.com/firefoxbrasil",
-}
-
-# Official Mozilla Twitter accounts
-MOZILLA_TWITTER_ACCOUNTS = {
-    "en-US": "https://twitter.com/mozilla",
-    "de": "https://twitter.com/mozilla_germany",
-    "fr": "https://twitter.com/mozilla_france",
-}
-
 # Official Firefox Instagram accounts
 MOZILLA_INSTAGRAM_ACCOUNTS = {
     "en-US": "https://www.instagram.com/mozilla/",
@@ -973,9 +935,6 @@ MOZILLA_INSTAGRAM_ACCOUNTS = {
 # ***This URL *MUST* end in a traling slash!***
 FXA_ENDPOINT = config("FXA_ENDPOINT", default="https://accounts.stage.mozaws.net/" if DEV else "https://accounts.firefox.com/")
 
-# Affiliate micro service (CJMS) endpoint (issue 11212)
-CJMS_AFFILIATE_ENDPOINT = "https://stage.cjms.nonprod.cloudops.mozgcp.net/aic" if DEV else "https://cjms.services.mozilla.com/aic"
-
 # Google Play and Apple App Store settings
 from .appstores import (  # noqa: E402, F401
     AMAZON_FIREFOX_FIRE_TV_LINK,
@@ -983,7 +942,6 @@ from .appstores import (  # noqa: E402, F401
     APPLE_APPSTORE_FIREFOX_LINK,
     APPLE_APPSTORE_FOCUS_LINK,
     APPLE_APPSTORE_KLAR_LINK,
-    APPLE_APPSTORE_POCKET_LINK,
     APPLE_APPSTORE_VPN_LINK,
     GOOGLE_PLAY_FIREFOX_BETA_LINK,
     GOOGLE_PLAY_FIREFOX_LINK,
@@ -992,7 +950,6 @@ from .appstores import (  # noqa: E402, F401
     GOOGLE_PLAY_FIREFOX_SEND_LINK,
     GOOGLE_PLAY_FOCUS_LINK,
     GOOGLE_PLAY_KLAR_LINK,
-    GOOGLE_PLAY_POCKET_LINK,
     GOOGLE_PLAY_VPN_LINK,
     MICROSOFT_WINDOWS_STORE_FIREFOX_BETA_DIRECT_LINK,
     MICROSOFT_WINDOWS_STORE_FIREFOX_BETA_WEB_LINK,
@@ -1273,8 +1230,18 @@ VPN_ENDPOINT = config("VPN_ENDPOINT", default="https://stage.guardian.nonprod.cl
 # ***This URL *MUST* end in a traling slash!***
 VPN_SUBSCRIPTION_URL = config("VPN_SUBSCRIPTION_URL", default="https://accounts.stage.mozaws.net/" if DEV else "https://accounts.firefox.com/")
 
+# New URL for VPN subscription links
+# ***This URL *MUST* end in a trailing slash!***
+VPN_SUBSCRIPTION_URL_NEXT = config(
+    "VPN_SUBSCRIPTION_URL_NEXT", default="https://payments-next.stage.fxa.nonprod.webservices.mozgcp.net/" if DEV else "https://payments.firefox.com/"
+)
+
+# For testing/QA we support a test 'daily' API endpoint on the staging API only
+VPN_SUBSCRIPTION_USE_DAILY_MODE__QA_ONLY = config("VPN_SUBSCRIPTION_USE_DAILY_MODE__QA_ONLY", default="False", parser=bool)
+
 # Product ID for VPN subscriptions
 VPN_PRODUCT_ID = config("VPN_PRODUCT_ID", default="prod_FiJ42WCzZNRSbS" if DEV else "prod_FvnsFHIfezy3ZI")
+VPN_PRODUCT_ID_NEXT = "mozillavpnstage" if DEV else "vpn"
 
 # VPN variable subscription plan IDs by currency/language.
 VPN_PLAN_ID_MATRIX = {
@@ -2116,7 +2083,6 @@ VPN_MOBILE_SUB_ANDROID_ONLY_COUNTRY_CODES = [
     "SN",  # Senegal
 ]
 
-VPN_AFFILIATE_COUNTRIES = ["CA", "DE", "FR", "GB", "IE", "US"]
 VPN_AVAILABLE_COUNTRIES = 57
 VPN_CONNECT_SERVERS = 500
 VPN_CONNECT_COUNTRIES = 30
@@ -2197,6 +2163,45 @@ RELAY_PRODUCT_URL = config(
     "RELAY_PRODUCT_URL", default="https://stage.fxprivaterelay.nonprod.cloudops.mozgcp.net/" if DEV else "https://relay.firefox.com/"
 )
 
+# VPN, Monitor, and Relay bundle ====================================================================
+
+# Product ID for VPN, Monitor, and Relay bundle subscriptions.
+VPN_MONITOR_RELAY_BUNDLE_PRODUCT_ID = config("VPN_MONITOR_RELAY_BUNDLE_PRODUCT_ID", default="prod_SFb8iVuZIOPREe" if DEV else "prod_SOYBYCOWallcgz")
+
+# VPN, Monitor, and Relay bundle plan IDs by currency/language.
+VPN_MONITOR_RELAY_BUNDLE_PLAN_ID_MATRIX = {
+    "usd": {
+        "en": {
+            "12-month": {
+                "id": "price_1RMAopKb9q6OnNsLSGe1vLtt" if DEV else "price_1RTl5CJNcmPzuWtRVETtMFUX",
+                "price": "8.25",
+                "total": "99",
+                "currency": "USD",
+                "saving": 40,
+                "analytics": {
+                    "brand": "vpn",
+                    "plan": "vpn + monitor + relay",
+                    "currency": "USD",
+                    "discount": "80.88",
+                    "price": "99",
+                    "period": "yearly",
+                },
+            },
+        }
+    },
+}
+
+# Map of country codes to allocated VPN Monitor, and Relay bundle currency/language plan IDs.
+VPN_MONITOR_RELAY_BUNDLE_PRICING = {
+    "US": {
+        "default": VPN_MONITOR_RELAY_BUNDLE_PLAN_ID_MATRIX["usd"]["en"],
+    },
+}
+
+# Countries where VPN Monitor, and Relay bundle is available.
+VPN_MONITOR_RELAY_BUNDLE_COUNTRY_CODES = [
+    "US",  # United States of America
+]
 
 # Authentication with Mozilla OpenID Connect / Auth0 ============================================
 
@@ -2308,7 +2313,7 @@ if WAGTAIL_ENABLE_ADMIN:
     # but only for deployments where the CMS is enabled. This is needed to support
     # complex pages with lots of (small, but) nested fields.
     # Resolves https://mozilla.sentry.io/issues/5800147294
-    DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
+    DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
 
 
 def lazy_wagtail_langs():
@@ -2329,6 +2334,8 @@ def lazy_wagtail_langs():
         ("ru", "Russian"),
         ("zh-CN", "Chinese (China-Simplified)"),
     ]
+    if DEV:
+        enabled_wagtail_langs.append(("ar", "Arabic"))  # To test the RTL support in the CMS
     enabled_language_codes = [x[0] for x in LANGUAGES]
     retval = [wagtail_lang for wagtail_lang in enabled_wagtail_langs if wagtail_lang[0] in enabled_language_codes]
     return retval
@@ -2399,10 +2406,21 @@ WAGTAIL_RICHTEXT_FEATURES_FULL = [
     "italic",
     "code",
     "blockquote",
+    "superscript",
     "link",
     "ol",
     "ul",
     "image",
+]
+
+WAGTAIL_RICHTEXT_FEATURES_MINIMAL = [
+    # https://docs.wagtail.org/en/stable/advanced_topics/customisation/page_editing_interface.html#limiting-features-in-a-rich-text-field
+    # Order here is the order used in the editor UI
+    "bold",
+    "italic",
+    "link",
+    "ol",
+    "ul",
 ]
 
 WAGTAILIMAGES_IMAGE_MODEL = "cms.BedrockImage"
@@ -2426,6 +2444,10 @@ WAGTAILIMAGES_EXTENSIONS = [
 #
 # NB: EVERY TIME you add a new Wagtail Page subclass to the CMS, you must enable
 # it here if you want it to be selectable as a new child page in Production
+#
+# You must ALSO consider if they need to be added to the DB export script. If
+# they are not, they will not be fully exported to the sqlite DB, which
+# may break things like demos and integration tests. See bin/export-db-to-sqlite.sh
 
 _allowed_page_models = [
     "cms.SimpleRichTextPage",
@@ -2433,6 +2455,8 @@ _allowed_page_models = [
     "mozorg.LeadershipPage",
     "products.VPNResourceCenterDetailPage",
     "products.VPNResourceCenterIndexPage",
+    "products.MonitorArticleIndexPage",
+    "products.MonitorArticlePage",
 ]
 
 if DEV is True:
@@ -2458,3 +2482,16 @@ if ENABLE_DJANGO_SILK := config("ENABLE_DJANGO_SILK", default="False", parser=bo
     MIDDLEWARE.insert(0, "silk.middleware.SilkyMiddleware")
     SUPPORTED_NONLOCALES.append("silk")
     SILKY_PYTHON_PROFILER = config("SILKY_PYTHON_PROFILER", default="False", parser=bool)
+
+# Config for redirection of certain pages over to www.firefox.com - if you override this,
+# be sure NOT to include `locale` - we add that in the redirects as and when needed
+# NOTE THE LACK OF TRAILING SLASH, too - this is deliberate and should be followed,
+# but if you use it without a path you must add a trailing slash to avoid a 302 at
+# the firefox.com end, because Django will append a trailing slash if it doesn't exist.
+FXC_BASE_URL = config("FXC_BASE_URL", default="https://www.firefox.com")
+
+MAKE_RELNOTES_REDIRECTS_PERMANENT = config(
+    "MAKE_RELNOTES_REDIRECTS_PERMANENT",
+    default="True",
+    parser=bool,
+)

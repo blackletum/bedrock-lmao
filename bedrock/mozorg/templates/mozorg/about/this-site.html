@@ -33,8 +33,9 @@
     </p>
 
     <p>
-      {{ ftl('about-this-site-today',
-             firefox=url('firefox.new'),
+      {{ ftl('about-this-site-today-v2',
+             fallback='about-this-site-today',
+             firefox="https://www.firefox.com/",
              vpn=url('products.vpn.landing'),
              mozilla=url('mozorg.about.index'),
              book=url('mozorg.book')) }}
@@ -64,7 +65,7 @@
         </a>
       </li>
       <li>
-        <a href="https://bedrock.readthedocs.io/">
+        <a href="https://mozilla.github.io/bedrock/">
           {{ ftl('about-this-site-read-the-docs') }}
         </a>
       </li>

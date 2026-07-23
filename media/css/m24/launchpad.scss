@@ -86,14 +86,6 @@ $launchpad-logo-spacing: $launchpad-logo-width + $launchpad-logo-padding;
         background-image: url('/media/protocol/img/logos/firefox/browser/logo.svg');
     }
 
-    &.m24-t-product-fakespot::before {
-        background-image: url('/media/img/logos/fakespot/logo.svg');
-    }
-
-    &.m24-t-product-pocket::before {
-        background-image: url('/media/protocol/img/logos/pocket/logo.svg');
-    }
-
     &.m24-t-product-vpn::before {
         background-image: url('/media/protocol/img/logos/mozilla/vpn/logo.svg');
     }
@@ -107,7 +99,7 @@ $launchpad-logo-spacing: $launchpad-logo-width + $launchpad-logo-padding;
     }
 
     &.m24-t-product-relay::before {
-        background-image: url('/media/protocol/img/logos/firefox/relay/logo-white.svg');
+        background-image: url('/media/protocol/img/logos/firefox/relay/logo.svg');
     }
 }
 
@@ -122,7 +114,7 @@ $launchpad-logo-spacing: $launchpad-logo-width + $launchpad-logo-padding;
     font-weight: 600;
     grid-column: 1 / span 10;
     line-height: 1;
-    
+
     b { // punctuation for screen readers
         color: transparent;
     }

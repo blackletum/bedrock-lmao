@@ -45,6 +45,46 @@ class HelpersTests(TestCase):
         context = {"key": "\xe4"}
         assert render(template, context) == '<a href="?var=%C3%A4">'
 
+    def test_add_bedrock_attributes(self):
+        fresh_html = """
+            <html>
+            <body>
+                <h1>Test h1</h1>
+                <p>No change</p>
+                <h2>Test h2 one</h2>
+                <ul>
+                    <li>one</li>
+                </ul>
+                <h2>Test h2 two</h2>
+                <ol>
+                    <li>two</li>
+                </ol>
+                <h3>Test @#$% h3</h3>
+                <p>Here is an <a href="https://example.com">external link</a></p>
+            </body>
+        </html>
+        """
+        expected_html = """
+<html>
+<body>
+<h1 id="test-h1">Test h1</h1>
+<p>No change</p>
+<h2 id="test-h2-one">Test h2 one</h2>
+<ul class="mzp-u-list-styled">
+<li>one</li>
+</ul>
+<h2 id="test-h2-two">Test h2 two</h2>
+<ol class="mzp-u-list-styled">
+<li>two</li>
+</ol>
+<h3 id="test-h3">Test @#$% h3</h3>
+<p>Here is an <a href="https://example.com" rel="external noopener" target="_blank">external link</a></p>
+</body>
+</html>
+"""
+        processed_html = helpers.add_bedrock_attributes(fresh_html)
+        assert processed_html == expected_html
+
 
 @override_settings(LANG_GROUPS={"en": ["en-US", "en-GB"]})
 def test_switch():
@@ -82,9 +122,24 @@ def test_switch():
             ["de", "pt-BR", "ja-JP", "zh-CN"],
         ),
         (
+            # Just use defaults
             ["en-US", "fr", "sco"],
             [],
             [],
+            ["en-US", "fr", "sco"],
+        ),
+        (
+            # Don't use CMS + Django Fallback
+            ["en-US", "fr", "sco"],
+            ["en-US", "de"],
+            [],
+            ["en-US", "fr", "sco"],
+        ),
+        (
+            # Don't use CMS + Django Fallback
+            ["en-US", "fr", "sco"],
+            [],
+            ["en-US", "de"],
             ["en-US", "fr", "sco"],
         ),
     ),
@@ -92,11 +147,12 @@ def test_switch():
 def test_get_locale_options(rf, translations_locales, cms_locales, django_locales, expected):
     native_translations = get_translations_native_names(translations_locales)
     native_expected = get_translations_native_names(expected)
-
     request = rf.get("/dummy/path/")
 
-    if cms_locales and django_locales:
+    if cms_locales is not None:
         request._locales_available_via_cms = cms_locales
+
+    if django_locales is not None:
         request._locales_for_django_fallback_view = django_locales
 
     assert native_expected == helpers.get_locale_options(

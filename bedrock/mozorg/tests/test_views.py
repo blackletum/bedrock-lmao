@@ -61,13 +61,23 @@ class TestHomePageLocales(TestCase):
         assert resp.status_code == 405
 
     @patch.object(views, "ftl_file_is_active", lambda *x: True)
-    def test_new_homepage_template(self, render_mock):
+    def test_m24_homepage_template(self, render_mock):
         req = RequestFactory().get("/")
         req.locale = "en-US"
         view = views.HomeView.as_view()
         view(req)
         template = render_mock.call_args[0][1]
-        assert template == ["mozorg/home/home-new.html"]
+        assert template == ["mozorg/home/home-m24.html"]
+
+    def test_new_homepage_template(self, render_mock):
+        req = RequestFactory().get("/")
+        req.locale = "en-US"
+        with patch.object(views, "ftl_file_is_active") as active_mock:
+            active_mock.side_effect = [False, True]
+            view = views.HomeView.as_view()
+            view(req)
+            template = render_mock.call_args[0][1]
+            assert template == ["mozorg/home/home-new.html"]
 
     @patch.object(views, "ftl_file_is_active", lambda *x: False)
     def test_old_homepage_template(self, render_mock):
@@ -79,13 +89,24 @@ class TestHomePageLocales(TestCase):
         assert template == ["mozorg/home/home-old.html"]
 
     @patch.object(views, "ftl_file_is_active", lambda *x: True)
-    def test_new_homepage_template_global(self, render_mock):
+    def test_m24_homepage_template_global(self, render_mock):
         req = RequestFactory().get("/")
         req.locale = "es-ES"
         view = views.HomeView.as_view()
         view(req)
         template = render_mock.call_args[0][1]
-        assert template == ["mozorg/home/home-new.html"]
+        assert template == ["mozorg/home/home-m24.html"]
+
+    @patch.object(views, "ftl_file_is_active", lambda *x: True)
+    def test_new_homepage_template_global(self, render_mock):
+        req = RequestFactory().get("/")
+        req.locale = "es-ES"
+        with patch.object(views, "ftl_file_is_active") as active_mock:
+            active_mock.side_effect = [False, True]
+            view = views.HomeView.as_view()
+            view(req)
+            template = render_mock.call_args[0][1]
+            assert template == ["mozorg/home/home-new.html"]
 
     @patch.object(views, "ftl_file_is_active", lambda *x: False)
     def test_old_homepage_template_global(self, render_mock):
@@ -224,21 +245,21 @@ class TestMiecoEmail(TestCase):
     def test_not_post(self):
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.content, b'{"error": 400, "message": "Only POST requests are allowed"}')
+        self.assertEqual(resp.text, '{"error": 400, "message": "Only POST requests are allowed"}')
         self.assertIn("Access-Control-Allow-Origin", resp.headers)
         self.assertIn("Access-Control-Allow-Headers", resp.headers)
 
     def test_bad_json(self):
         resp = self.client.post(self.url, content_type="application/json", data='{{"bad": "json"}')
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.content, b'{"error": 400, "message": "Error decoding JSON"}')
+        self.assertEqual(resp.text, '{"error": 400, "message": "Error decoding JSON"}')
         self.assertIn("Access-Control-Allow-Origin", resp.headers)
         self.assertIn("Access-Control-Allow-Headers", resp.headers)
 
     def test_invalid_email(self):
         resp = self.client.post(self.url, content_type="application/json", data='{"email": "foo@bar"}')
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.content, b'{"error": 400, "message": "Invalid form data"}')
+        self.assertEqual(resp.text, '{"error": 400, "message": "Invalid form data"}')
         self.assertIn("Access-Control-Allow-Origin", resp.headers)
         self.assertIn("Access-Control-Allow-Headers", resp.headers)
 
@@ -246,7 +267,7 @@ class TestMiecoEmail(TestCase):
         self.data["message_id"] = "the-dude"
         resp = self.client.post(self.url, content_type="application/json", data=json.dumps(self.data))
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(resp.content, b'{"error": 400, "message": "Invalid form data"}')
+        self.assertEqual(resp.text, '{"error": 400, "message": "Invalid form data"}')
         self.assertIn("Access-Control-Allow-Origin", resp.headers)
         self.assertIn("Access-Control-Allow-Headers", resp.headers)
 
@@ -259,7 +280,7 @@ class TestMiecoEmail(TestCase):
         mock_emailMessage.assert_called_once_with(
             views.MIECO_EMAIL_SUBJECT["mieco"], "rendered", views.MIECO_EMAIL_SENDER, views.MIECO_EMAIL_TO["mieco"]
         )
-        self.assertEqual(resp.content, b'{"status": "ok"}')
+        self.assertEqual(resp.text, '{"status": "ok"}')
         self.assertIn("Access-Control-Allow-Origin", resp.headers)
         self.assertIn("Access-Control-Allow-Headers", resp.headers)
 
@@ -273,7 +294,7 @@ class TestMiecoEmail(TestCase):
         mock_emailMessage.assert_called_once_with(
             views.MIECO_EMAIL_SUBJECT["mieco"], "rendered", views.MIECO_EMAIL_SENDER, views.MIECO_EMAIL_TO["mieco"]
         )
-        self.assertEqual(resp.content, b'{"status": "ok"}')
+        self.assertEqual(resp.text, '{"status": "ok"}')
         self.assertIn("Access-Control-Allow-Origin", resp.headers)
         self.assertIn("Access-Control-Allow-Headers", resp.headers)
 
@@ -287,7 +308,7 @@ class TestMiecoEmail(TestCase):
         mock_emailMessage.assert_called_once_with(
             views.MIECO_EMAIL_SUBJECT["innovations"], "rendered", views.MIECO_EMAIL_SENDER, views.MIECO_EMAIL_TO["innovations"]
         )
-        self.assertEqual(resp.content, b'{"status": "ok"}')
+        self.assertEqual(resp.text, '{"status": "ok"}')
         self.assertIn("Access-Control-Allow-Origin", resp.headers)
         self.assertIn("Access-Control-Allow-Headers", resp.headers)
 

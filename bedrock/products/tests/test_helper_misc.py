@@ -7,6 +7,7 @@ from django.test.utils import override_settings
 
 import pytest
 from django_jinja.backend import Jinja2
+from waffle.testutils import override_switch
 
 from bedrock.mozorg.tests import TestCase
 from bedrock.products.templatetags.misc import vpn_supported_locale
@@ -15,6 +16,8 @@ TEST_FXA_ENDPOINT = "https://accounts.firefox.com/"
 TEST_VPN_ENDPOINT = "https://vpn.mozilla.org/"
 TEST_VPN_PRODUCT_ID = "prod_FvnsFHIfezy3ZI"
 TEST_VPN_SUBSCRIPTION_URL = "https://accounts.firefox.com/"
+TEST_VPN_SUBSCRIPTION_URL_NEXT = "https://payments.firefox.com/"
+TEST_VPN_PRODUCT_ID_NEXT = "vpn"
 
 TEST_VPN_PLAN_ID_MATRIX = {
     "chf": {  # Swiss franc
@@ -537,6 +540,7 @@ def render(s, context=None):
     VPN_SUBSCRIPTION_URL=TEST_VPN_SUBSCRIPTION_URL,
     VPN_VARIABLE_PRICING=TEST_VPN_VARIABLE_PRICING,
 )
+@override_switch("VPN_SUBPLAT_NEXT", active=False)
 class TestVPNSubscribeLink(TestCase):
     rf = RequestFactory()
 
@@ -550,12 +554,13 @@ class TestVPNSubscribeLink(TestCase):
         lang=None,
         optional_parameters=None,
         optional_attributes=None,
+        bundle_monitor_relay=False,
     ):
         req = self.rf.get("/")
         req.locale = "en-US"
         return render(
             f"""{{{{ vpn_subscribe_link('{entrypoint}', '{link_text}', '{plan}', '{class_name}', '{country_code}',
-                                        '{lang}', {optional_parameters}, {optional_attributes}) }}}}""",
+                                        '{lang}', {optional_parameters}, {optional_attributes}, {bundle_monitor_relay}) }}}}""",
             {"request": req},
         )
 
@@ -565,6 +570,7 @@ class TestVPNSubscribeLink(TestCase):
             plan="12-month",
             country_code="US",
             lang="en-US",
+            bundle_monitor_relay=False,
             optional_parameters={"utm_campaign": "vpn-product-page"},
             optional_attributes={"data-cta-text": "Get Mozilla VPN yearly", "data-cta-type": "fxa-vpn", "data-cta-position": "primary"},
         )
@@ -1224,6 +1230,142 @@ class TestVPNSubscribeLink(TestCase):
             lang="sk",
         )
         self.assertIn("?plan=price_1N7PKyJNcmPzuWtROTKgdgW0", markup)
+
+
+@override_settings(
+    FXA_ENDPOINT=TEST_FXA_ENDPOINT,
+    VPN_PRODUCT_ID=TEST_VPN_PRODUCT_ID,
+    VPN_SUBSCRIPTION_URL_NEXT=TEST_VPN_SUBSCRIPTION_URL_NEXT,
+    VPN_PRODUCT_ID_NEXT=TEST_VPN_PRODUCT_ID_NEXT,
+    VPN_SUBSCRIPTION_URL=TEST_VPN_SUBSCRIPTION_URL,
+    VPN_VARIABLE_PRICING=TEST_VPN_VARIABLE_PRICING,
+    VPN_SUBSCRIPTION_USE_DAILY_MODE__QA_ONLY=False,
+)
+@override_switch("VPN_SUBPLAT_NEXT", active=True)
+class TestVPNSubscribeLinkNext(TestCase):
+    rf = RequestFactory()
+
+    def _render(
+        self,
+        entrypoint="www.mozilla.org-vpn-product-page",
+        link_text="Get Mozilla VPN",
+        plan="12-month",
+        class_name="mzp-c-button",
+        country_code=None,
+        lang=None,
+        optional_parameters=None,
+        optional_attributes=None,
+    ):
+        req = self.rf.get("/")
+        req.locale = "en-US"
+        return render(
+            f"""{{{{ vpn_subscribe_link('{entrypoint}', '{link_text}', '{plan}', '{class_name}', '{country_code}',
+                                        '{lang}', {optional_parameters}, {optional_attributes}) }}}}""",
+            {"request": req},
+        )
+
+    def test_vpn_subscribe_link_variable_12_month(self):
+        """Should return expected markup for variable 12-month plan link"""
+        markup = self._render(
+            plan="12-month",
+            country_code="US",
+            lang="en-US",
+            optional_parameters={"utm_campaign": "vpn-product-page"},
+            optional_attributes={"data-cta-text": "Get Mozilla VPN yearly", "data-cta-type": "fxa-vpn", "data-cta-position": "primary"},
+        )
+        expected = (
+            '<a href="https://payments.firefox.com/vpn/yearly/landing/'
+            "?entrypoint=www.mozilla.org-vpn-product-page&form_type=button&service=e6eb0d1e856335fc&utm_source=www.mozilla.org-vpn-product-page"
+            '&utm_medium=referral&utm_campaign=vpn-product-page&data_cta_position=primary" data-action="https://accounts.firefox.com/" '
+            'class="js-fxa-product-cta-link js-fxa-product-button mzp-c-button ga-begin-checkout" data-cta-text="Get Mozilla VPN yearly" '
+            "data-cta-type=\"fxa-vpn\" data-cta-position=\"primary\" data-ga-item=\"{'id' : 'price_1Iw85dJNcmPzuWtRyhMDdtM7','brand' : 'vpn',"
+            "'plan' : 'vpn','period' : 'yearly','price' : '59.88','discount' : '60.00','currency' : 'USD'}\">Get Mozilla VPN</a>"
+        )
+        self.assertEqual(markup, expected)
+
+    def test_vpn_subscribe_link_variable_12_month_no_options(self):
+        """Should return expected markup for variable 12-month plan link with analytics"""
+        markup = self._render(
+            plan="12-month",
+            country_code="US",
+            lang="en-US",
+        )
+        expected = (
+            '<a href="https://payments.firefox.com/vpn/yearly/landing/'
+            "?entrypoint=www.mozilla.org-vpn-product-page&form_type=button&service=e6eb0d1e856335fc&utm_source=www.mozilla.org-vpn-product-page"
+            '&utm_medium=referral" data-action="https://accounts.firefox.com/" class="js-fxa-product-cta-link js-fxa-product-button mzp-c-button '
+            "ga-begin-checkout\" data-ga-item=\"{'id' : 'price_1Iw85dJNcmPzuWtRyhMDdtM7','brand' : 'vpn','plan' : 'vpn','period' : 'yearly',"
+            "'price' : '59.88','discount' : '60.00','currency' : 'USD'}\">Get Mozilla VPN</a>"
+        )
+        self.assertEqual(markup, expected)
+
+    def test_vpn_subscribe_link_variable_monthly(self):
+        """Should return expected markup for variable monthly plan link"""
+        markup = self._render(
+            plan="monthly",
+            country_code="US",
+            lang="en-US",
+            optional_parameters={"utm_campaign": "vpn-product-page"},
+            optional_attributes={"data-cta-text": "Get Mozilla VPN monthly", "data-cta-type": "fxa-vpn", "data-cta-position": "primary"},
+        )
+        expected = (
+            '<a href="https://payments.firefox.com/vpn/monthly/landing/'
+            "?entrypoint=www.mozilla.org-vpn-product-page&form_type=button&service=e6eb0d1e856335fc&utm_source=www.mozilla.org-vpn-product-page"
+            '&utm_medium=referral&utm_campaign=vpn-product-page&data_cta_position=primary" data-action="https://accounts.firefox.com/" '
+            'class="js-fxa-product-cta-link js-fxa-product-button mzp-c-button ga-begin-checkout" data-cta-text="Get Mozilla VPN monthly" '
+            "data-cta-type=\"fxa-vpn\" data-cta-position=\"primary\" data-ga-item=\"{'id' : 'price_1Iw7qSJNcmPzuWtRMUZpOwLm','brand' : 'vpn',"
+            "'plan' : 'vpn','period' : 'monthly','price' : '9.99','discount' : '0','currency' : 'USD'}\">Get Mozilla VPN</a>"
+        )
+        self.assertEqual(markup, expected)
+
+    def test_vpn_subscribe_link_daily_instead_of_monthly_for_staging_testing_only(self):
+        """Should return expected markup for a link to a daily subscription that ONLY exists on the staging server for QA"""
+
+        with override_settings(VPN_SUBSCRIPTION_USE_DAILY_MODE__QA_ONLY=True):
+            markup = self._render(
+                plan="monthly",
+                country_code="US",
+                lang="en-US",
+                optional_parameters={"utm_campaign": "vpn-product-page"},
+                optional_attributes={"data-cta-text": "Get Mozilla VPN monthly", "data-cta-type": "fxa-vpn", "data-cta-position": "primary"},
+            )
+
+        # The only change compared to monthly sub is the /daily/ in the URL, not any of the params
+        expected = (
+            '<a href="https://payments.firefox.com/vpn/daily/landing/'
+            "?entrypoint=www.mozilla.org-vpn-product-page&form_type=button&service=e6eb0d1e856335fc&utm_source=www.mozilla.org-vpn-product-page"
+            '&utm_medium=referral&utm_campaign=vpn-product-page&data_cta_position=primary" data-action="https://accounts.firefox.com/" '
+            'class="js-fxa-product-cta-link js-fxa-product-button mzp-c-button ga-begin-checkout" data-cta-text="Get Mozilla VPN monthly" '
+            "data-cta-type=\"fxa-vpn\" data-cta-position=\"primary\" data-ga-item=\"{'id' : 'price_1Iw7qSJNcmPzuWtRMUZpOwLm','brand' : 'vpn',"
+            "'plan' : 'vpn','period' : 'monthly','price' : '9.99','discount' : '0','currency' : 'USD'}\">Get Mozilla VPN</a>"
+        )
+        self.assertEqual(markup, expected)
+
+    def test_vpn_subscribe_link_remains_annual_when_qa_mode_is_on(self):
+        """Should return expected markup for a link to an annual subscription even though
+        the QA mode for daily subscription is on, because that only affects 'monthly' mode
+
+        The output here is the same as for test_vpn_subscribe_link_variable_12_month
+        """
+
+        with override_settings(VPN_SUBSCRIPTION_USE_DAILY_MODE__QA_ONLY=True):
+            markup = self._render(
+                plan="12-month",
+                country_code="US",
+                lang="en-US",
+                optional_parameters={"utm_campaign": "vpn-product-page"},
+                optional_attributes={"data-cta-text": "Get Mozilla VPN yearly", "data-cta-type": "fxa-vpn", "data-cta-position": "primary"},
+            )
+            expected = (
+                '<a href="https://payments.firefox.com/vpn/yearly/landing/'
+                "?entrypoint=www.mozilla.org-vpn-product-page&form_type=button&service=e6eb0d1e856335fc&utm_source=www.mozilla.org-vpn-product-page"
+                '&utm_medium=referral&utm_campaign=vpn-product-page&data_cta_position=primary" data-action="https://accounts.firefox.com/" '
+                'class="js-fxa-product-cta-link js-fxa-product-button mzp-c-button ga-begin-checkout" data-cta-text="Get Mozilla VPN yearly" '
+                "data-cta-type=\"fxa-vpn\" data-cta-position=\"primary\" data-ga-item=\"{'id' : 'price_1Iw85dJNcmPzuWtRyhMDdtM7','brand' : 'vpn',"
+                "'plan' : 'vpn','period' : 'yearly','price' : '59.88','discount' : '60.00','currency' : 'USD'}\">Get Mozilla VPN</a>"
+            )
+
+        self.assertEqual(markup, expected)
 
 
 @override_settings(VPN_VARIABLE_PRICING=TEST_VPN_VARIABLE_PRICING)
@@ -2025,6 +2167,7 @@ class TestVPNProductReferralLink(TestCase):
         link_to_pricing_page=False,
         page_anchor="",
         link_text=None,
+        is_cta_button_styled=True,
         class_name=None,
         optional_attributes=None,
         optional_parameters=None,
@@ -2034,8 +2177,16 @@ class TestVPNProductReferralLink(TestCase):
             req.locale = "en-US"
 
             return render(
-                f"""{{{{ vpn_product_referral_link('{referral_id}', {link_to_pricing_page}, '{page_anchor}',
-                                                   '{link_text}', '{class_name}', {optional_attributes}, {optional_parameters}) }}}}""",
+                f"""{{{{ vpn_product_referral_link(
+                    '{referral_id}',
+                    {link_to_pricing_page},
+                    '{page_anchor}',
+                    '{link_text}',
+                    {is_cta_button_styled},
+                    '{class_name}',
+                    {optional_attributes},
+                    {optional_parameters}
+                ) }}}}""",
                 {"request": req},
             )
 
@@ -2077,12 +2228,13 @@ class TestVPNProductReferralLink(TestCase):
             referral_id="navigation",
             link_to_pricing_page=True,
             link_text="Get Mozilla VPN",
+            is_cta_button_styled=False,
             class_name="mzp-t-product mzp-t-secondary mzp-t-md",
             optional_attributes={"data-cta-text": "Get Mozilla VPN", "data-cta-type": "vpn"},
             optional_parameters={"coupon": "cyber20"},
         )
         expected = (
-            '<a href="/en-US/products/vpn/pricing/?coupon=cyber20" class="mzp-c-button js-fxa-product-referral-link '
+            '<a href="/en-US/products/vpn/pricing/?coupon=cyber20" class="js-fxa-product-referral-link '
             'mzp-t-product mzp-t-secondary mzp-t-md" data-referral-id="navigation" '
             'data-cta-text="Get Mozilla VPN" data-cta-type="vpn">Get Mozilla VPN</a>'
         )

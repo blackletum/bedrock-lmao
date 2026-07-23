@@ -1,6 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
 import json
 import re
 from collections import defaultdict
@@ -8,7 +9,6 @@ from unittest.mock import patch
 
 from django.conf import settings
 from django.http import HttpResponse
-from django.test import override_settings
 from django.test.client import Client
 from django.urls import resolvers
 
@@ -20,7 +20,6 @@ from bedrock.contentful.constants import (
     VRC_ROOT_PATH,
 )
 from bedrock.contentful.models import ContentfulEntry
-from bedrock.releasenotes.models import ProductRelease
 from bedrock.security.models import SecurityAdvisory
 
 SEC_KNOWN_VULNS = [
@@ -67,34 +66,6 @@ def get_security_urls():
     return urls
 
 
-def get_release_notes_urls():
-    urls = {}
-    for release in ProductRelease.objects.exclude(product="Thunderbird"):
-        # we redirect all release notes for versions 28.x and below to an archive
-        # and Firefox for iOS uses a different version numbering scheme
-        if release.product != "Firefox for iOS" and release.major_version_int < 29:
-            continue
-
-        try:
-            rel_path = release.get_absolute_url()
-            req_path = release.get_sysreq_url()
-        except resolvers.NoReverseMatch:
-            continue
-
-        # strip "/en-US" off the front
-        if rel_path.startswith("/en-US"):
-            rel_path = rel_path[6:]
-        if req_path.startswith("/en-US"):
-            req_path = req_path[6:]
-
-        urls[rel_path] = ["en-US"]
-        urls[req_path] = ["en-US"]
-
-    return urls
-
-
-# DEV should always be False for this to avoid some URLs that are only present in DEV=True mode
-@override_settings(DEV=False)
 def get_static_urls():
     urls = {}
     client = Client()
@@ -227,13 +198,16 @@ def get_wagtail_urls():
     return urls
 
 
-def update_sitemaps():
+def get_all_urls():
     urls = get_static_urls()
-    urls.update(get_release_notes_urls())
     urls.update(get_security_urls())
     urls.update(get_contentful_urls())
     urls.update(get_wagtail_urls())
+    return urls
 
+
+def update_sitemaps():
+    urls = get_all_urls()
     # Output static files
     output_json(urls)
 

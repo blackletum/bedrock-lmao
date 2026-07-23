@@ -20,11 +20,13 @@ ID02:
 CO01:
   enabled: true
   brands:
-    - Fakespot
     - Firefox
+    - MDN
     - Mozilla
-    - Pocket
     - "{ -brand-name-mozilla } account"
+    - "{ -brand-name-mozilla } VPN"
   exclusions:
     files: []
-    messages: []
+    messages:
+      # Obsolete string (expires 2025-12-19) - This exclusion should be removed when the string is removed
+      - vpn-windows-protect-your-windows

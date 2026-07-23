@@ -161,14 +161,14 @@ class TestDownloadButtons(TestCase):
         get_request.locale = "fr"
         doc = pq(render("{{ download_firefox() }}", {"request": get_request, "fluent_l10n": self.get_l10n(get_request.locale)}))
 
-        # The first 8 links should be for desktop.
+        # The first 9 links should be for desktop.
         links = doc(".download-list a")
 
-        for link in links[:8]:
+        for link in links[:9]:
             assert pq(link).attr("data-direct-link").startswith(settings.BOUNCER_URL)
 
-        # The ninth link is mobile and should not have the attr
-        assert pq(links[8]).attr("data-direct-link") is None
+        # The 10th link is mobile and should not have the attr
+        assert pq(links[9]).attr("data-direct-link") is None
 
     def test_nightly_desktop(self):
         """
@@ -208,7 +208,7 @@ class TestDownloadButtons(TestCase):
         )
 
         list = doc(".download-list li")
-        assert list.length == 8
+        assert list.length == 9
         assert pq(list[0]).attr("class") == "os_win64"
         assert pq(list[1]).attr("class") == "os_win64-msi"
         assert pq(list[2]).attr("class") == "os_win64-aarch64"
@@ -216,7 +216,8 @@ class TestDownloadButtons(TestCase):
         assert pq(list[4]).attr("class") == "os_win-msi"
         assert pq(list[5]).attr("class") == "os_osx"
         assert pq(list[6]).attr("class") == "os_linux64"
-        assert pq(list[7]).attr("class") == "os_linux"
+        assert pq(list[7]).attr("class") == "os_linux64-aarch64"
+        assert pq(list[8]).attr("class") == "os_linux"
 
     def test_beta_desktop(self):
         """The Beta channel should not have Windows 64 build yet"""
@@ -228,7 +229,7 @@ class TestDownloadButtons(TestCase):
         )
 
         list = doc(".download-list li")
-        assert list.length == 8
+        assert list.length == 9
         assert pq(list[0]).attr("class") == "os_win64"
         assert pq(list[1]).attr("class") == "os_win64-msi"
         assert pq(list[2]).attr("class") == "os_win64-aarch64"
@@ -236,7 +237,8 @@ class TestDownloadButtons(TestCase):
         assert pq(list[4]).attr("class") == "os_win-msi"
         assert pq(list[5]).attr("class") == "os_osx"
         assert pq(list[6]).attr("class") == "os_linux64"
-        assert pq(list[7]).attr("class") == "os_linux"
+        assert pq(list[7]).attr("class") == "os_linux64-aarch64"
+        assert pq(list[8]).attr("class") == "os_linux"
 
     def test_firefox_desktop(self):
         """The Release channel should not have Windows 64 build yet"""
@@ -246,7 +248,7 @@ class TestDownloadButtons(TestCase):
         doc = pq(render("{{ download_firefox(platform='desktop') }}", {"request": get_request, "fluent_l10n": self.get_l10n(get_request.locale)}))
 
         list = doc(".download-list li")
-        assert list.length == 8
+        assert list.length == 9
         assert pq(list[0]).attr("class") == "os_win64"
         assert pq(list[1]).attr("class") == "os_win64-msi"
         assert pq(list[2]).attr("class") == "os_win64-aarch64"
@@ -254,7 +256,8 @@ class TestDownloadButtons(TestCase):
         assert pq(list[4]).attr("class") == "os_win-msi"
         assert pq(list[5]).attr("class") == "os_osx"
         assert pq(list[6]).attr("class") == "os_linux64"
-        assert pq(list[7]).attr("class") == "os_linux"
+        assert pq(list[7]).attr("class") == "os_linux64-aarch64"
+        assert pq(list[8]).attr("class") == "os_linux"
 
     def test_latest_nightly_android(self):
         """The download button should have a Google Play link"""
@@ -406,15 +409,16 @@ class TestDownloadList(TestCase):
 
         # Check that links classes are ordered as expected.
         list = doc(".download-platform-list li")
-        assert list.length == 8
+        assert list.length == 9
         assert pq(list[0]).attr("class") == "os_win64"
         assert pq(list[1]).attr("class") == "os_win64-msi"
         assert pq(list[2]).attr("class") == "os_win64-aarch64"
         assert pq(list[3]).attr("class") == "os_osx"
         assert pq(list[4]).attr("class") == "os_linux64"
-        assert pq(list[5]).attr("class") == "os_linux"
-        assert pq(list[6]).attr("class") == "os_win"
-        assert pq(list[7]).attr("class") == "os_win-msi"
+        assert pq(list[5]).attr("class") == "os_linux64-aarch64"
+        assert pq(list[6]).attr("class") == "os_linux"
+        assert pq(list[7]).attr("class") == "os_win"
+        assert pq(list[8]).attr("class") == "os_win-msi"
 
         links = doc(".download-platform-list a")
 
@@ -439,15 +443,16 @@ class TestDownloadList(TestCase):
 
         # Check that links classes are ordered as expected.
         list = doc(".download-platform-list li")
-        assert list.length == 8
+        assert list.length == 9
         assert pq(list[0]).attr("class") == "os_win64"
         assert pq(list[1]).attr("class") == "os_win64-msi"
         assert pq(list[2]).attr("class") == "os_win64-aarch64"
         assert pq(list[3]).attr("class") == "os_osx"
         assert pq(list[4]).attr("class") == "os_linux64"
-        assert pq(list[5]).attr("class") == "os_linux"
-        assert pq(list[6]).attr("class") == "os_win"
-        assert pq(list[7]).attr("class") == "os_win-msi"
+        assert pq(list[5]).attr("class") == "os_linux64-aarch64"
+        assert pq(list[6]).attr("class") == "os_linux"
+        assert pq(list[7]).attr("class") == "os_win"
+        assert pq(list[8]).attr("class") == "os_win-msi"
 
         links = doc(".download-platform-list a")
 
@@ -596,3 +601,61 @@ def test_send_to_device_form(test_input, expected):
 
     newsletter_id = doc("input[name='newsletters']").val()
     assert newsletter_id == expected["newsletter_id"]
+
+
+@pytest.mark.parametrize(
+    "fake_request_path, override_path, root_url, expected_result",
+    (
+        (
+            "/en-US/firefox/140.0/releasenotes/",
+            "",
+            "",
+            f'<link rel="canonical" href="{settings.FXC_BASE_URL}/en-US/firefox/140.0/releasenotes/">',
+        ),
+        (
+            "/en-US/firefox/140.0/releasenotes/",
+            "",
+            "ftp://getfirefox.de",
+            '<link rel="canonical" href="ftp://getfirefox.de/en-US/firefox/140.0/releasenotes/">',
+        ),
+        (
+            "/en-US/firefox/140.0/releasenotes/",
+            "/some/other/path/",
+            "",
+            f'<link rel="canonical" href="{settings.FXC_BASE_URL}/some/other/path/">',
+        ),
+        (
+            "/en-US/firefox/140.0/releasenotes/",
+            "",
+            "https://www.example.com",
+            '<link rel="canonical" href="https://www.example.com/en-US/firefox/140.0/releasenotes/">',
+        ),
+        (
+            "/en-US/firefox/140.0/releasenotes/",
+            "/some/other/path/",
+            "https://www.example.com",
+            '<link rel="canonical" href="https://www.example.com/some/other/path/">',
+        ),
+    ),
+)
+def test_firefox_com_canonical_tag(
+    rf,
+    fake_request_path,
+    override_path,
+    root_url,
+    expected_result,
+):
+    def _render(dest_path, root_url):
+        req = rf.get(fake_request_path)
+
+        if dest_path and root_url:
+            tmpl = f"{{{{ firefox_com_canonical_tag(dest_path='{dest_path}', root_url='{root_url}') }}}}"
+        elif dest_path:
+            tmpl = f"{{{{ firefox_com_canonical_tag(dest_path='{dest_path}') }}}}"
+        elif root_url:
+            tmpl = f"{{{{ firefox_com_canonical_tag(root_url='{root_url}') }}}}"
+        else:
+            tmpl = "{{ firefox_com_canonical_tag() }}"
+        return render(tmpl, {"request": req})
+
+    assert _render(override_path, root_url) == expected_result

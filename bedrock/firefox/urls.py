@@ -10,6 +10,8 @@ from bedrock.mozorg.util import page
 from bedrock.releasenotes import version_re
 from bedrock.utils.views import VariationTemplateView
 
+# Note that these regular expressions are also used in bedrock.firefox.redirects,
+# so if they become redundant here, they will need to be moved to that module.
 latest_re = r"^firefox(?:/(?P<version>%s))?/%s/$"
 firstrun_re = latest_re % (version_re, "firstrun")
 whatsnew_re = latest_re % (version_re, "whatsnew")
@@ -24,14 +26,12 @@ ios_sysreq_re = sysreq_re.replace(r"firefox", "firefox/ios")
 
 
 urlpatterns = (
-    path("firefox/", views.FirefoxHomeView.as_view(), name="firefox"),
     path(
         "firefox/challenge-the-default/",
         VariationTemplateView.as_view(
             template_name="firefox/challenge-the-default/landing-switch.html",
             active_locales=["de", "es-ES", "fr", "it", "pl"],
             variation_locales=["de", "fr"],
-            ftl_files=["firefox/home"],
             template_context_variations=["1", "2", "3", "4", "5", "6"],
         ),
     ),
@@ -111,7 +111,6 @@ urlpatterns = (
     ),
     path("firefox/ios/testflight/", views.ios_testflight, name="firefox.ios.testflight"),
     page("firefox/unsupported-systems/", "firefox/unsupported-systems.html"),
-    path("firefox/new/", views.NewView.as_view(), name="firefox.new"),
     path("firefox/download/thanks/", views.DownloadThanksView.as_view(), name="firefox.download.thanks"),
     page("firefox/nightly/firstrun/", "firefox/nightly/firstrun.html", ftl_files=["firefox/nightly/firstrun"]),
     path("firefox/installer-help/", views.InstallerHelpView.as_view(), name="firefox.installer-help"),
@@ -145,7 +144,6 @@ urlpatterns = (
     path("firefox/releases/", bedrock.releasenotes.views.releases_index, {"product": "Firefox"}, name="firefox.releases.index"),
     path("firefox/stub_attribution_code/", views.stub_attribution_code, name="firefox.stub_attribution_code"),
     path("firefox/welcome/1/", views.firefox_welcome_page1, name="firefox.welcome.page1"),
-    page("firefox/welcome/2/", "firefox/welcome/page2.html", ftl_files=["firefox/welcome/page2"]),
     page("firefox/welcome/4/", "firefox/welcome/page4.html", ftl_files=["firefox/welcome/page4"]),
     page("firefox/welcome/6/", "firefox/welcome/page6.html", ftl_files=["firefox/welcome/page6"]),
     page("firefox/welcome/7/", "firefox/welcome/page7.html", ftl_files=["firefox/welcome/page7"]),
@@ -161,7 +159,6 @@ urlpatterns = (
     page("firefox/welcome/17a/", "firefox/welcome/page17/page17-a.html", ftl_files=["firefox/welcome/page14"], active_locales=["en-US", "fr", "de"]),
     page("firefox/welcome/17b/", "firefox/welcome/page17/page17-b.html", ftl_files=["firefox/welcome/page14"], active_locales=["en-US", "fr", "de"]),
     page("firefox/welcome/17c/", "firefox/welcome/page17/page17-c.html", ftl_files=["firefox/welcome/page14"], active_locales=["en-US", "fr", "de"]),
-    page("firefox/welcome/18/", "firefox/welcome/page18.html"),
     page(
         "firefox/welcome/19/",
         "firefox/welcome/page19.html",
@@ -190,7 +187,6 @@ urlpatterns = (
     page("firefox/welcome/24/", "firefox/welcome/page24.html", ftl_files=["firefox/welcome/page24"]),
     page("firefox/welcome/25/", "firefox/welcome/page25.html", active_locales=["en-US", "fr", "de"]),
     page("firefox/switch/", "firefox/switch.html", ftl_files=["firefox/switch"]),
-    page("firefox/pocket/", "firefox/pocket.html"),
     page("firefox/share/", "firefox/share.html", active_locales=["de", "fr", "en-US", "en-CA"]),
     page("firefox/nothing-personal/", "firefox/nothing-personal/index.html"),
     # Issue 6604, SEO firefox/new pages
@@ -271,8 +267,10 @@ urlpatterns = (
         "firefox/firefox-20th/index.html",
         active_locales=["de", "fr", "en-US", "en-CA", "en-GB"],
     ),
-    # Issue 15841 - UK influencer campaign
+    # Issue 15841, 15920, 5953 - UK influencer campaign pages
     page("firefox/landing/tech/", "firefox/landing/tech.html", ftl_files="firefox/new/desktop", active_locales="en-GB"),
+    page("firefox/landing/education/", "firefox/landing/education.html", ftl_files="firefox/new/desktop", active_locales="en-GB"),
+    page("firefox/landing/gaming/", "firefox/landing/gaming.html", ftl_files="firefox/new/desktop", active_locales="en-GB"),
     page("firefox/landing/get/", "firefox/landing/get.html", ftl_files="firefox/new/desktop"),
 )
 

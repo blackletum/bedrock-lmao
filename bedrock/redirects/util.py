@@ -4,10 +4,12 @@
 
 import re
 from collections import defaultdict
+from copy import deepcopy
 from urllib.parse import parse_qs, urlencode
 
 from django.conf import settings
 from django.http import (
+    Http404,
     HttpResponseGone,
     HttpResponsePermanentRedirect,
     HttpResponseRedirect,
@@ -92,15 +94,27 @@ def mobile_app_redirector(request, product, campaign):
     android_re = re.compile(r"\bAndroid\b", flags=re.I)
     value = request.headers.get("User-Agent", "")
 
+    # Map product names to tracking product codes
+    product_mapping = {
+        "firefox": "firefox_mobile",
+        "firefox_beta": "firefox_mobile",
+        "firefox_nightly": "firefox_mobile",
+        "focus": "focus",
+        "klar": "klar",
+        "vpn": "vpn",
+    }
+
+    tracking_product = product_mapping.get(product, "unrecognized")
+
     if android_re.search(value):
         base_url = getattr(settings, f"GOOGLE_PLAY_{product.upper()}_LINK")
         params = "&referrer=utm_source%3Dwww.mozilla.org%26utm_medium%3Dreferral%26utm_campaign%3D{cmp}"
     else:
         base_url = getattr(settings, f"APPLE_APPSTORE_{product.upper()}_LINK").replace("/{country}/", "/")
-        params = "?pt=373246&ct={cmp}&mt=8"
+        params = "?pt=373246&ct={cmp}&mt=8&mz_pr={tp}"
 
     if campaign:
-        return base_url + params.format(cmp=campaign)
+        return base_url + params.format(cmp=campaign, tp=tracking_product)
     else:
         return base_url
 
@@ -187,7 +201,7 @@ def redirect(
         redirect(r'projects/$', 'mozorg.product'),
         redirect(r'^projects/seamonkey$', 'mozorg.product', locale_prefix=False),
         redirect(r'apps/$', 'https://marketplace.firefox.com'),
-        redirect(r'firefox/$', 'firefox.new', name='firefox'),
+        redirect(r'firefox/$', settings.FXC_BASE_URL, name='firefox'),  # note that redirect_source querystring is not added by default
         redirect(r'the/dude$', 'abides', query={'aggression': 'not_stand'}),
     ]
     """
@@ -223,6 +237,9 @@ def redirect(
         query = query.copy()
 
     def _view(request, *args, **kwargs):
+        # Avoid the _view closure capturing the original _query state
+        request_query = deepcopy(query)
+
         # don't want to have 'None' in substitutions
         kwargs = {k: v or "" for k, v in kwargs.items()}
         args = [x or "" for x in args]
@@ -239,7 +256,7 @@ def redirect(
             try:
                 redirect_url = reverse(to_value, args=to_args, kwargs=to_kwargs)
                 # reverse() will give us, by default, a redirection
-                # with settings.LANGAUGE_CODE as the prefixed language.
+                # with settings.LANGUAGE_CODE as the prefixed language.
                 # We don't want this by default, only if explicitly requested
                 redirect_url = _drop_lang_code(redirect_url)
             except NoReverseMatch:
@@ -248,6 +265,21 @@ def redirect(
 
         if prepend_locale and redirect_url.startswith("/") and kwargs.get("locale"):
             redirect_url = "/{locale}" + redirect_url.lstrip("/")
+        elif prepend_locale and "{_locale}" in redirect_url:
+            # So this is a full domain / offsite redirect, not a relative one.
+            # But do we have a locale already known to us? If so, use it, to avoid
+            # a 302 on the destination when the locale is re-detected
+            #
+            # Note that we're using a variable called _locale in the URL template
+            # to deliberately avoid clashing with `locale` in the current variable
+            # space.
+            if kwargs.get("locale"):  # extracted as, say, "fr/"
+                _locale = kwargs.get("locale").rstrip("/")
+                redirect_url = redirect_url.format(_locale=_locale)
+            else:
+                # If we don't yet have a locale to use in the redirect, we have to
+                # just live without it
+                redirect_url = redirect_url.replace("/{_locale}", "")
 
         # use info from url captures.
         if args or kwargs:
@@ -258,13 +290,13 @@ def redirect(
                 redirect_url = redirect_url.format_map(defaultdict(str, kwargs))
             redirect_url = strip_tags(redirect_url)
 
-        if query:
+        if request_query:
             if merge_query:
-                req_query = parse_qs(request.META.get("QUERY_STRING", ""))
-                query.update(req_query)
+                _req_qs_query = parse_qs(request.META.get("QUERY_STRING", ""))
+                request_query.update(_req_qs_query)
 
-            querystring = urlencode(query, doseq=True)
-        elif query is None:
+            querystring = urlencode(request_query, doseq=True)
+        elif request_query is None:
             querystring = request.META.get("QUERY_STRING", "")
         else:
             querystring = ""
@@ -300,3 +332,12 @@ def gone_view(request, *args, **kwargs):
 def gone(pattern):
     """Return a url matcher suitable for urlpatterns that returns a 410."""
     return re_path(pattern, gone_view)
+
+
+def not_found_view(request, *args, **kwargs):
+    raise Http404()
+
+
+def not_found(pattern):
+    """Return a url matcher suitable for urlpatterns that raises a 404."""
+    return re_path(pattern, not_found_view)

@@ -18,8 +18,6 @@ home-mitchell-baker-v2 = Mitchell Baker, Executive Chair of the Board, { -brand-
 home-mozilla-makes-privacy = { -brand-name-mozilla } makes privacy-respecting products
 home-product-firefox-browsing = Private & secure browsing
 home-cta-get-firefox = Get { -brand-name-firefox }
-home-product-pocket-articles = The web’s most intriguing articles
-home-cta-get-pocket = Get { -brand-name-pocket}
 
 home-product-relay-hide-your = Hide your phone number and email from spammers
 home-cta-get-relay = Get { -brand-name-relay }
@@ -28,8 +26,6 @@ home-cta-get-vpn = Get { -brand-name-mozilla-vpn }
 
 home-product-monitor-protect-your = Protect your private info from data brokers
 home-cta-get-monitor = Get { -brand-name-monitor }
-home-product-fakespot-detect = Detect fake shopping reviews
-home-cta-get-fakespot = Get { -brand-name-fakespot }
 
 home-mozilla-takes-bets = “{ -brand-name-mozilla } is taking bets to show the world there’s a business to be made with trustworthy AI. That includes putting things like human rights, data protection and transparency at the core of how these complex systems work.”
 
@@ -42,14 +38,10 @@ home-read-more = Read more
 
 home-so-what-is-mozilla = So, what is { -brand-name-mozilla }?
 
-# Obsolete string (expires: 2025-01-05)
-home-at-its-core = At its core, { -brand-name-mozilla } is an activist organization led by the { -brand-name-mozilla-foundation } that makes change in the world through a variety of ventures including { -brand-name-mozilla-corporation }, MZLA, <a {$ventures}>{ -brand-name-mozilla-ventures }</a> and <a {$mozai}>{ -brand-name-mozilla-ai }</a>. How are we different? Because we’re mission-driven, it means we have the freedom to make all of our decisions based on what’s best for the internet and for everyone online, not based on the demands of shareholders — we don’t actually have any of those.
-
 # Variables
 #   $ventures - link to https://mozilla.vc/
 #   $mozai - link to https://mozilla.ai/
 home-at-its-core-v2 = At its core, { -brand-name-mozilla } is an activist organization led by the { -brand-name-mozilla-foundation } that makes change in the world through a variety of ventures including { -brand-name-mozilla-corporation }, MZLA, <a {$ventures}>{ -brand-name-mozilla-ventures }</a> and <a {$mozai}>{ -brand-name-mozilla-ai-v2 }</a>. How are we different? Because we’re mission-driven, it means we have the freedom to make all of our decisions based on what’s best for the internet and for everyone online, not based on the demands of shareholders — we don’t actually have any of those.
-
 
 home-learn-about-mofo = Learn about the { -brand-name-mozilla-foundation }
 

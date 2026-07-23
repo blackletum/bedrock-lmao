@@ -1,8 +1,18 @@
 {
     "m.homeserver": {
-        "base_url": "https://mozilla.modular.im"
+        "base_url": "https://mozilla.modular.im/"
     },
     "m.identity_server": {
         "base_url": "https://vector.im"
-    }
+    },
+    "org.matrix.msc2965.authentication": {
+        "issuer": "https://chat.mozilla.org/",
+        "account": "https://chat.mozilla.org/account/account"
+    },
+    "org.matrix.msc4143.rtc_foci": [
+        {
+            "type": "livekit",
+            "livekit_service_url": "https://jwt.call.element.io"
+        }
+    ]
 }

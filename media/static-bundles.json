@@ -56,12 +56,6 @@
     },
     {
       "files": [
-        "css/mozorg/social-content-policies.scss"
-      ],
-      "name": "social-content-policies"
-    },
-    {
-      "files": [
         "css/mozorg/mpl-differences.scss"
       ],
       "name": "mpl-differences"
@@ -116,6 +110,18 @@
     },
     {
       "files": [
+        "css/firefox/new/desktop/firefox-new-refresh-ie9.scss"
+      ],
+      "name": "firefox_new_refresh_ie9"
+    },
+    {
+      "files": [
+        "css/firefox/new/desktop/firefox-new-refresh-ie8.scss"
+      ],
+      "name": "firefox_new_refresh_ie8"
+    },
+    {
+      "files": [
         "css/firefox/new/desktop/ie8.scss"
       ],
       "name": "firefox_desktop_download_ie8"
@@ -129,12 +135,6 @@
     },
     {
       "files": [
-        "css/firefox/new/desktop/thanks-ie.scss"
-      ],
-      "name": "firefox_desktop_download_thanks_ie"
-    },
-    {
-      "files": [
         "css/firefox/new/common/thanks-messaging.scss",
         "css/firefox/new/basic/thanks.scss"
       ],
@@ -142,15 +142,21 @@
     },
     {
       "files": [
-        "css/firefox/new/basic/ie.scss"
-      ],
-      "name": "firefox_new_ie"
-    },
-    {
-      "files": [
         "css/firefox/landing/get/marketing-opt-out.scss"
       ],
       "name": "firefox_marketing_opt_out"
+    },
+    {
+      "files": [
+        "css/firefox/new/desktop/firefox-new-refresh.scss"
+      ],
+      "name": "firefox_new_refresh"
+    },
+    {
+      "files": [
+        "css/firefox/landing/index.scss"
+      ],
+      "name": "firefox_landing"
     },
     {
       "files": [
@@ -200,18 +206,6 @@
         "css/mozorg/home/home-new.scss"
       ],
       "name": "home-new"
-    },
-    {
-      "files": [
-        "css/base/banners/fundraiser.scss"
-      ],
-      "name": "fundraising-banner"
-    },
-    {
-      "files": [
-        "css/mozorg/home/includes/monitor-banner.scss"
-      ],
-      "name": "monitor-banner"
     },
     {
       "files": [
@@ -266,6 +260,12 @@
         "css/legal/legal.scss"
       ],
       "name": "legal"
+    },
+    {
+      "files": [
+        "css/legal/terms-firefox.scss"
+      ],
+      "name": "terms-firefox"
     },
     {
       "files": [
@@ -389,6 +389,12 @@
     },
     {
       "files": [
+        "css/firefox/whatsnew/whatsnew-142beta.scss"
+      ],
+      "name": "firefox_whatsnew_142beta"
+    },
+    {
+      "files": [
         "css/firefox/whatsnew/whatsnew-130.scss"
       ],
       "name": "firefox_whatsnew_130"
@@ -443,12 +449,6 @@
     },
     {
       "files": [
-        "css/firefox/whatsnew/whatsnew-135beta.scss"
-      ],
-      "name": "firefox_whatsnew_135beta"
-    },
-    {
-      "files": [
         "css/firefox/whatsnew/whatsnew-135.scss"
       ],
       "name": "firefox_whatsnew_135"
@@ -458,6 +458,48 @@
         "css/firefox/whatsnew/whatsnew-135-pdf.scss"
       ],
       "name": "firefox_whatsnew_135_pdf"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-136-pip.scss"
+      ],
+      "name": "firefox_whatsnew_136_pip"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-137-vertical-tabs.scss"
+      ],
+      "name": "firefox_whatsnew_137_vertical_tabs"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-138.scss"
+      ],
+      "name": "firefox_whatsnew_138"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-139-awesome-bar.scss"
+      ],
+      "name": "firefox_whatsnew_139"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-140-productivity-shortcuts.scss"
+      ],
+      "name": "firefox_whatsnew_140"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-141-customize-new-tab.scss"
+      ],
+      "name": "firefox_whatsnew_141"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-142-tracking-protection-de-fr.scss"
+      ],
+      "name": "firefox_whatsnew_142_tracking_protection_de_fr"
     },
     {
       "files": [
@@ -488,6 +530,12 @@
         "css/newsletter/newsletter-developer.scss"
       ],
       "name": "newsletter-developer"
+    },
+    {
+      "files": [
+        "css/newsletter/newsletter-ten-tabs.scss"
+      ],
+      "name": "newsletter-ten-tabs"
     },
     {
       "files": [
@@ -567,12 +615,6 @@
         "css/firefox/unsupported-systems.scss"
       ],
       "name": "firefox_unsupported_systems"
-    },
-    {
-      "files": [
-        "css/protocol/protocol-mozilla.scss"
-      ],
-      "name": "protocol-mozilla"
     },
     {
       "files": [
@@ -722,12 +764,6 @@
         "css/mozorg/commit-access-requirements.scss"
       ],
       "name": "commit-access-requirements"
-    },
-    {
-      "files": [
-        "css/firefox/pocket.scss"
-      ],
-      "name": "product_pocket"
     },
     {
       "files": [
@@ -882,12 +918,6 @@
     },
     {
       "files": [
-        "css/firefox/welcome18.scss"
-      ],
-      "name": "firefox_welcome_page18"
-    },
-    {
-      "files": [
         "css/firefox/welcome19-to-25.scss"
       ],
       "name": "firefox_welcome_page19_to_25"
@@ -933,6 +963,12 @@
         "css/products/vpn/landing-refresh.scss"
       ],
       "name": "mozilla-vpn-landing-refresh"
+    },
+    {
+      "files": [
+        "css/products/vpn/bundle-promo.scss"
+      ],
+      "name": "mozilla-vpn-bundle-promo"
     },
     {
       "files": [
@@ -1134,6 +1170,12 @@
     },
     {
       "files": [
+        "css/products/monitor/article.scss"
+      ],
+      "name": "monitor-article"
+    },
+    {
+      "files": [
         "css/products/monitor/waitlist.scss"
       ],
       "name": "monitor-waitlist"
@@ -1195,9 +1237,9 @@
     {
       "files": [
         "css/m24/root.scss",
-        "css/protocol/protocol-mozilla-2024.scss"
+        "css/protocol/protocol-mozilla.scss"
       ],
-      "name": "protocol-mozilla-2024"
+      "name": "protocol-mozilla"
     },
     {
       "files": [
@@ -1210,6 +1252,12 @@
         "css/protocol/navigation-and-footer.scss"
       ],
       "name": "legacy-navigation-and-footer"
+    },
+    {
+      "files": [
+        "css/firefox/whatsnew/whatsnew-142.scss"
+      ],
+      "name": "firefox_whatsnew_142"
     }
   ],
   "js": [
@@ -1293,6 +1341,19 @@
     },
     {
       "files": [
+        "js/firefox/new/desktop/firefox-new-refresh.js"
+      ],
+      "name": "firefox_new_refresh"
+    },
+    {
+      "files": [
+        "js/firefox/new/desktop/download-as-default.es6.js",
+        "js/firefox/new/desktop/download-as-default-init.es6.js"
+      ],
+      "name": "download_as_default"
+    },
+    {
+      "files": [
         "js/firefox/new/common/thanks.js",
         "js/firefox/new/common/thanks-init.js"
       ],
@@ -1310,6 +1371,12 @@
         "js/firefox/landing/get/marketing-opt-out-init.es6.js"
       ],
       "name": "firefox_marketing_opt_out"
+    },
+    {
+      "files": [
+        "js/firefox/landing/init.es6.js"
+      ],
+      "name": "firefox_landing"
     },
     {
       "files": [
@@ -1383,12 +1450,31 @@
     },
     {
       "files": [
+        "js/base/legal-toc.es6.js"
+      ],
+      "name": "legal_toc"
+    },
+    {
+      "files": [
         "js/base/uitour-lib.js",
         "js/base/mozilla-client.js",
         "js/base/protocol/utils.es6.js",
-        "js/base/protocol/init-details.es6.js"
+        "js/base/protocol/init-details.es6.js",
+        "js/privacy/privacy-modal-link.es6.js"
       ],
       "name": "privacy_firefox_simple"
+    },
+    {
+      "files": [
+        "js/privacy/privacy-modal-link.es6.js"
+      ],
+      "name": "tos_modal_link"
+    },
+    {
+      "files": [
+        "js/privacy/redirects.es6.js"
+      ],
+      "name": "privacy_redirects"
     },
     {
       "files": [
@@ -1468,6 +1554,12 @@
     },
     {
       "files": [
+        "js/firefox/whatsnew/whatsnew-mofo-donate-experiment.es6.js"
+      ],
+      "name": "firefox_whatsnew_donate_experiment"
+    },
+    {
+      "files": [
         "js/firefox/whatsnew/whatsnew-events.js"
       ],
       "name": "firefox_whatsnew_events"
@@ -1534,6 +1626,38 @@
     },
     {
       "files": [
+        "js/firefox/whatsnew/whatsnew-137-uitour.es6.js",
+        "js/firefox/whatsnew/whatsnew-137-video-events.es6.js"
+      ],
+      "name": "firefox_whatsnew_137"
+    },
+    {
+      "files": [
+        "js/firefox/whatsnew/whatsnew-138-video-events.es6.js"
+      ],
+      "name": "firefox_whatsnew_138"
+    },
+    {
+      "files": [
+        "js/firefox/whatsnew/whatsnew-141-uitour.es6.js",
+        "js/firefox/whatsnew/whatsnew-141-video-events.es6.js"
+      ],
+      "name": "firefox_whatsnew_141"
+    },
+    {
+      "files": [
+        "js/firefox/whatsnew/whatsnew-142-base.es6.js"
+      ],
+      "name": "firefox_whatsnew_142"
+    },
+    {
+      "files": [
+        "js/firefox/whatsnew/whatsnew-142-uitour-de-fr.es6.js"
+      ],
+      "name": "firefox_whatsnew_142_de_fr"
+    },
+    {
+      "files": [
         "js/firefox/firefox-20th/firefox-20th.js"
       ],
       "name": "firefox_20th"
@@ -1589,6 +1713,12 @@
         "js/base/protocol/init-m24-navigation.es6.js"
       ],
       "name": "m24-ui"
+    },
+    {
+      "files": [
+        "js/base/banners/m24-pencil-banner-mofo-experiment.es6.js"
+      ],
+      "name": "pencil-banner-mofo-experiment"
     },
     {
       "files": [
@@ -1702,12 +1832,6 @@
     },
     {
       "files": [
-        "js/products/shared/affiliate-init.es6.js"
-      ],
-      "name": "mozilla-vpn-affiliate"
-    },
-    {
-      "files": [
         "js/products/vpn/invite.es6.js",
         "js/products/vpn/invite-init.es6.js"
       ],
@@ -1718,6 +1842,18 @@
         "js/products/vpn/thanks.js"
       ],
       "name": "vpn_platform_download"
+    },
+    {
+      "files": [
+        "js/products/vpn/promo-tabs.js"
+      ],
+      "name": "vpn_promo_tabs"
+    },
+    {
+      "files": [
+        "js/products/vpn/bundle-promo-experiment.es6.js"
+      ],
+      "name": "vpn-bundle-promo-experiment"
     },
     {
       "files": [
@@ -1801,21 +1937,9 @@
     },
     {
       "files": [
-        "js/mozorg/home/monitor-banner.es6.js"
-      ],
-      "name": "monitor-banner"
-    },
-    {
-      "files": [
         "js/m24/animation-play-state.es6.js"
       ],
       "name": "m24-animation"
-    },
-    {
-      "files": [
-        "js/mozorg/rise25/rise25.js"
-      ],
-      "name": "rise25-landing"
     },
     {
       "files": [
@@ -1825,21 +1949,15 @@
     },
     {
       "files": [
-        "js/base/banners/fundraiser.es6.js"
-      ],
-      "name": "fundraising-banner"
-    },
-    {
-      "files": [
-        "js/base/banners/fundraiser-experiment.es6.js"
-      ],
-      "name": "fundraising-banner-experiment"
-    },
-    {
-      "files": [
         "js/firefox/landing/partner-build-download-init.es6.js"
       ],
       "name": "firefox_partner_build_download"
+    },
+    {
+      "files": [
+        "js/base/article-toc.es6.js"
+      ],
+      "name": "monitor_article"
     }
   ]
 }

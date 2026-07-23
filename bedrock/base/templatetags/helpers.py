@@ -4,14 +4,17 @@
 
 import datetime
 import logging
+import re
 import urllib.parse
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.urls import NoReverseMatch
 from django.utils.encoding import smart_str
+from django.utils.text import slugify
 
 import jinja2
+from bs4 import BeautifulSoup
 from django_jinja import library
 from markupsafe import Markup
 
@@ -168,8 +171,38 @@ def get_locale_options(request, translations):
     # the locale being requested. In this situation _locales_available_via_cms
     # and _locales_for_django_fallback_view are annotated onto the request.
     # We need to use these to create a more accurate view of what locales are
-    # available
-    if hasattr(request, "_locales_available_via_cms") and hasattr(request, "_locales_for_django_fallback_view"):
+    # available. Also note that being decorated with prefer_cms doesn't guarantee
+    # that the annotated lists of locales contain any values, so we must also count
+    # them to be sure they are viable lists.
+
+    cms_locale_count = len(getattr(request, "_locales_available_via_cms", []))
+    django_fallback_locale_count = len(getattr(request, "_locales_for_django_fallback_view", []))
+
+    if cms_locale_count > 0 and django_fallback_locale_count > 0:
         available_locales = get_translations_native_names(sorted(set(request._locales_available_via_cms + request._locales_for_django_fallback_view)))
 
     return available_locales
+
+
+@library.filter
+def add_bedrock_attributes(html):
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Add id to headings
+    headings = soup.find_all(re.compile("h[1-6]{1}"))
+    for heading in headings:
+        heading["id"] = slugify(heading.text)
+
+    # Add protocol list class to ul and ol lists
+    lists = soup.find_all(["ul", "ol"])
+    for list in lists:
+        list["class"] = list.get("class", []) + ["mzp-u-list-styled"]
+
+    # Add rel and target to external links
+    external_links = soup.find_all("a", {"href": True})
+    for link in external_links:
+        if link["href"].startswith("http"):
+            link["rel"] = "external noopener"
+            link["target"] = "_blank"
+
+    return str(soup)

@@ -21,21 +21,27 @@
     <p>{{ftl('not-found-page-were-all-about-a-healthy-internet') }}</p>
 
     <p class="hide-back" id="go-back">
-      <a class="back-button">{{ ftl('not-found-page-go-back') }}</a>
+      <a class="back-button" data-testid="link-go-back">{{ ftl('not-found-page-go-back') }}</a>
     </p>
 
     <ul class="content-list">
       <li>
         <img class="list-icon" alt="" src="{{ static('protocol/img/icons/mozilla.svg') }}" width="30" height="30">
-        {{ ftl('not-found-page-learn-about-mozilla-the-non', about=url('mozorg.about.index')) }}
+        <span>
+          {{ ftl('not-found-page-learn-about-mozilla-the-non', about=url('mozorg.about.index')) }}
+        </span>
       </li>
       <li>
         <img class="list-icon" alt="" src="{{ static('protocol/img/icons/desktop.svg') }}" width="30" height="30">
-        {{ ftl('not-found-page-download-the-firefox-browser', download=url('firefox.new')) }}
+        <span>
+          {{ ftl('not-found-page-download-the-firefox-browser', download="https://www.firefox.com/") }}
+        </span>
       </li>
       <li>
         <img class="list-icon" alt="" src="{{ static('protocol/img/icons/default-browser.svg') }}" width="30" height="30">
-        {{ ftl('not-found-page-donate-to-mozilla-reclaim-from', donate='href="%s"'|safe|format(donate_url(location='donate-404'))) }}
+        <span>
+          {{ ftl('not-found-page-donate-to-mozilla-reclaim-from-v2', fallback='not-found-page-donate-to-mozilla-reclaim-from', donate='href="%s"'|safe|format(donate_url(location='donate-404'))) }}
+        </span>
       </li>
     </ul>
   </main>

@@ -23,14 +23,7 @@
 {% block page_desc %}{{ ftl('home-did-you-know-mozilla-the-maker') }}{% endblock %}
 
 {% set fundraising_banner_langs = ['en-US', 'en-GB', 'en-CA', 'es-AR', 'es-CL', 'es-ES', 'es-MX', 'de', 'fr', 'it', 'pl', 'pt-BR'] %}
-{% set show_fundraising_banner = switch('fundraising-banner-giving2024') and LANG in fundraising_banner_langs %}
 {% set show_firefox_app_store_banner = switch('firefox-app-store-banner') %}
-
-{% block experiments %}
-  {% if show_fundraising_banner %}
-    {{ js_bundle('fundraising-banner-experiment') }}
-  {% endif %}
-{% endblock %}
 
 {% block page_css %}
   {{ css_bundle('protocol-split') }}
@@ -46,17 +39,13 @@
     {{ css_bundle('ctd-promo') }}
   {% endif %}
 
-  {% if show_fundraising_banner %}
-    {{ css_bundle('fundraising-banner') }}
-  {% elif show_firefox_app_store_banner %}
+  {% if show_firefox_app_store_banner %}
     {{ css_bundle('firefox-app-store-banner') }}
   {% endif %}
 {% endblock %}
 
 {% block page_banner %}
-  {% if show_fundraising_banner %}
-    {% include 'includes/banners/fundraiser.html' %}
-  {% elif show_firefox_app_store_banner %}
+  {% if show_firefox_app_store_banner %}
     {% include 'includes/banners/mobile/firefox-app-store.html' %}
   {% endif %}
 {% endblock %}
@@ -107,43 +96,7 @@
           ),
           body=True,
           ) %}
-        <a href="{{ url('firefox.new')}}" class="mzp-c-button mzp-t-secondary" id="homepage-get-firefox" data-cta-text="Get Firefox" >{{ ftl('home-cta-get-firefox') }}</a>
-      {% endcall %}
-
-      <!-- Pocket -->
-      {% call picto(
-        base_el='li',
-        title=ftl('home-product-pocket-articles'),
-        image=resp_img(
-          url='protocol/img/logos/pocket/logo.svg',
-          optional_attributes={
-            'class': 'mzp-c-picto-image c-product-pocket',
-            'loading': 'lazy',
-            'width': '45',
-            'height': '45'
-          }
-          ),
-          body=True,
-          ) %}
-        <a href="https://getpocket.com/{{ utm_params }}" rel="external noopener" class="mzp-c-button mzp-t-secondary" id="homepage-get-pocket" data-cta-text="Get Pocket" data-cta-type="pocket">{{ ftl('home-cta-get-pocket') }}</a>
-      {% endcall %}
-
-      <!-- Fakespot -->
-      {% call picto(
-        base_el='li',
-        title=ftl('home-product-fakespot-detect'),
-        image=resp_img(
-          url='img/logos/fakespot/logo-blue.svg',
-          optional_attributes={
-            'class': 'mzp-c-picto-image',
-            'loading': 'lazy',
-            'width': '50',
-            'height': '50'
-          }
-          ),
-          body=True,
-          ) %}
-        <a href="https://fakespot.com/{{ utm_params }}" class="mzp-c-button mzp-t-secondary" id="homepage-get-fakespot" data-cta-text="Get Fakespot" data-cta-type="fakespot">{{ ftl('home-cta-get-fakespot') }}</a>
+        <a href="{{ "https://www.firefox.com/"}}" class="mzp-c-button mzp-t-secondary" id="homepage-get-firefox" data-cta-text="Get Firefox" >{{ ftl('home-cta-get-firefox') }}</a>
       {% endcall %}
 
       <!-- Relay -->
@@ -151,7 +104,7 @@
         base_el='li',
         title=ftl('home-product-relay-hide-your'),
         image=resp_img(
-          url='protocol/img/logos/firefox/relay/logo-white.svg',
+          url='protocol/img/logos/firefox/relay/logo.svg',
           optional_attributes={
             'class': 'mzp-c-picto-image',
             'loading': 'lazy',
@@ -257,7 +210,7 @@
         media_after=False
     ) %}
     <h2>{{ ftl('home-so-what-is-mozilla') }}</h2>
-    <p>{{ ftl('home-at-its-core-v2', fallback='home-at-its-core', ventures=moz_ventures, mozai=moz_ai) }}</p>
+    <p>{{ ftl('home-at-its-core-v2', ventures=moz_ventures, mozai=moz_ai) }}</p>
     <a href="https://foundation.mozilla.org/{{ utm_params }}" rel="external noopener" class="mzp-c-button">
       {{ ftl('home-learn-about-mofo') }}
     </a>
@@ -328,9 +281,7 @@
 {% block js %}
   {{ js_bundle('newsletter') }}
 
-  {% if show_fundraising_banner %}
-    {{ js_bundle('fundraising-banner') }}
-  {% elif show_firefox_app_store_banner %}
+  {% if show_firefox_app_store_banner %}
     {{ js_bundle('firefox-app-store-banner') }}
   {% endif %}
 {% endblock %}

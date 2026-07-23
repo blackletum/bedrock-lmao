@@ -9,6 +9,9 @@
 # We deliberately don't set -e here because we don't want a failure to block subsequent tasks
 set -x
 
+# ENV Vars for the below commands
+export ALLOWED_HOSTS='*'
+
 # run all jobs
 ALL=false
 # run jobs that require secrets
@@ -32,6 +35,8 @@ failure_detected=false
 
 # Please ensure all new command calls are suffixed with || failure_detected=true
 
+# make sure l10n files are here for use in other commands
+python manage.py l10n_update || failure_detected=true
 python manage.py update_product_details_files || failure_detected=true
 python manage.py update_security_advisories --quiet || failure_detected=true
 python manage.py update_wordpress --quiet || failure_detected=true
@@ -41,7 +46,7 @@ python manage.py update_externalfiles --quiet || failure_detected=true
 python manage.py update_newsletter_data --quiet || failure_detected=true
 python manage.py update_legal_docs --quiet || failure_detected=true
 python manage.py update_webvision_docs --quiet || failure_detected=true
-python manage.py update_sitemaps_data --quiet || failure_detected=true
+DEV=False python manage.py update_sitemaps_data --quiet || failure_detected=true
 python manage.py sync_greenhouse --quiet || failure_detected=true
 
 # if [[ "$AUTH" == true ]]; then

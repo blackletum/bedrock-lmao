@@ -4,7 +4,6 @@
 
 ### URL: https://www-dev.allizom.org/products/vpn/features/
 
-vpn-features-page-title = Features - { -brand-name-mozilla-vpn }
 vpn-features-mozilla-vpn = { -brand-name-mozilla-vpn }
 
 # HTML page title
@@ -56,15 +55,12 @@ vpn-features-support-for-custom-dns = Support for custom DNS
 vpn-features-keep-traffic-protected = With { -brand-name-mozilla-vpn }, you can keep your traffic protected and still route your DNS queries wherever you prefer. <a { $dns }>Learn more about custom DNS support</a>.
 
 vpn-features-flexible = Flexible
+vpn-features-webste-specific-vpn = Website-specific VPN settings, seamlessly integrated into { -brand-name-firefox }
+vpn-features-with-the-mozilla-vpn-extention = With the { -brand-name-mozilla-vpn } Extension for { -brand-name-firefox } (Windows only), you can fine-tune your VPN experience on a per-website basis. Exclude individual websites from VPN protection or set preferred server locations for specific sites, giving you a more flexible and personalized experience.
 vpn-features-personalized-server = Personalized server location recommendations
 vpn-features-well-suggest-which-servers = We’ll suggest which servers near you will ensure the fastest, most reliable internet connection.
 vpn-features-personalize-which-apps = Personalize which apps get VPN protection
 vpn-features-easily-exclude-apps = Easily exclude apps from VPN protection — no need to disconnect your device from { -brand-name-mozilla-vpn }. Available in Windows, Android and Linux devices.
-vpn-features-set-different-locations = Set different locations for each tab in { -brand-name-firefox }
-
-# Variables
-#   $containers (url) - link to https://support.mozilla.org/kb/use-multi-account-containers-mozilla-vpn
-vpn-features-combine-mozilla-vpn-with-containers = Combine { -brand-name-mozilla-vpn } with the Multi-Account Containers { -brand-name-firefox } extension and set different VPN locations per { -brand-name-firefox } tab. <a { $containers }>Learn how</a>.
 
 vpn-features-trustworthy = Trustworthy
 vpn-features-money-back = 30-day money-back guarantee
@@ -90,4 +86,6 @@ vpn-features-people-over-profits = People over profits
 
 # Variables
 #   $mofo (url) - link to https://foundation.mozilla.org/
+# Obsolete string (expires 19-10-2025)
 vpn-features-were-backed-by-mofo = We’re backed by the <a { $mofo }>{ -brand-name-mozilla-foundation }</a>, a non-profit fighting to keep the web open and healthy for all people.
+vpn-features-were-backed-by-mofo-v2 = We’re backed by <a { $mofo }>{ -brand-name-mozilla-foundation }</a>, a non-profit fighting to keep the web open and healthy for all people.

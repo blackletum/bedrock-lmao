@@ -30,10 +30,6 @@ m24-home-firefox = { -brand-name-firefox }
 m24-home-get-the-gold = Get the gold standard for browsing with speed, privacy and control.
 m24-home-thunderbird = { -brand-name-thunderbird }
 m24-home-go-chaosfree-with = Simplify your life with one app for all your emails, calendars and contacts.
-m24-home-fakespot = { -brand-name-fakespot }
-m24-home-spot-fake-reviews = Spot fake reviews, bad products and untrustworthy sellers.
-m24-home-pocket = { -brand-name-pocket }
-m24-home-save-the-internets = Save the internet’s best content on any device — because who has time to read everything now?
 m24-home-mozilla-vpn = { -brand-name-mozilla-vpn }
 m24-home-keep-your-location = Keep your location and online adventures private — stream like a local, anywhere.
 m24-home-mozilla-monitor = { -brand-name-mozilla-monitor }
@@ -43,8 +39,12 @@ m24-home-mask-your-email = Mask your email and phone number so you only get the 
 
 ## Donate
 
+# Obsolete string (expires 04-12-2025)
 m24-home-donate-to-the = Donate to the { -brand-name-mozilla } non-profit
+m24-home-donate-to-v2 = Donate to { -brand-name-mozilla-foundation }
+# Obsolete string (expires 04-12-2025)
 m24-home-mozilla-is-building = { -brand-name-mozilla } is building a movement to reclaim the internet. Together we can build a future where our privacy is protected, AI is trustworthy and irresponsible tech companies are held accountable. But that’s only possible if we do it together.
+m24-home-mozilla-foundation-is-building-v2 = { -brand-name-mozilla-foundation }  is building a future where technology is powered by people, and open by design. That’s why we fuel community-centered tech through advocacy, education, funding, and innovation — to make sure that the future of tech is good for everyone. But that’s only possible if we do it together.
 m24-home-were-proudly-nonprofit = We’re proudly non-profit. Will you donate to { -brand-name-mozilla } today?
 m24-home-donate = Donate
 
@@ -59,9 +59,9 @@ m24-home-get-started = Get started
 m24-home-join-the-movement = Join the movement:<br> AI for the people
 m24-home-our-mission-is = Our mission is to make it easy for people to build with, and collaborate on, open-source, trustworthy AI.
 # Used as an accessible text alternative for an image
-m24-home-alt-llamafile-logo = { -brand-name-llamafile } logo.
-m24-home-llamafile = { -brand-name-llamafile }
-m24-home-run-large-language = Run large language models (LLMs) easily on your computer with { -brand-name-llamafile } — no installation needed, and your data stays safe on your device.
+m24-home-alt-solo-ai-logo = { -brand-name-solo-ai } logo
+m24-home-solo-ai = { -brand-name-solo-ai }
+m24-home-create-your-website = Create your website and connect your custom domain for free
 m24-home-alt-builders = Builders
 m24-home-alt-builders-v2 = { -brand-name-builders }
 m24-home-mozilla-builders= { -brand-name-mozilla } Builders
@@ -97,8 +97,6 @@ m24-home-tag-video = Video
 m24-home-topic-news = News
 m24-home-topic-ai = Artificial Intelligence
 m24-home-topic-ps = Privacy & Security
-# Obsolete string (expires: 2025-02-03)
-m24-home-headline-you-ai = Headline: You, AI and the internet — what’s really going on?
 m24-home-headline-you-ai-v2 = You, AI and the internet — what’s really going on?
 m24-home-introducing-anonym = Introducing { -brand-name-anonym }: Raising the bar for privacy-preserving digital advertising.
 m24-home-keeping-genai-technologies = Keeping GenAI technologies secure is a shared responsibility.

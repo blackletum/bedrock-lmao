@@ -2,61 +2,28 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+import re
+from functools import partial
+
+from django.conf import settings
+
+from bedrock.firefox.urls import (
+    android_releasenotes_re,
+    android_sysreq_re,
+    channel_re,
+    ios_releasenotes_re,
+    ios_sysreq_re,
+    platform_re,
+    releasenotes_re,
+    sysreq_re,
+)
 from bedrock.redirects.util import mobile_app_redirector, no_redirect, platform_redirector, redirect
 
 PRODUCT_OPTIONS = ["firefox", "focus", "klar"]
-CAMPAIGN_OPTIONS = [
-    "firefox-whatsnew",
-    "firefox-welcome-4",
-    "firefox-welcome-6",
-    "firefox-welcome-17-en",
-    "firefox-welcome-17-de",
-    "firefox-welcome-17-fr",
-    "firefox-browsers-mobile-get-app",
-    "firefox-browsers-mobile-focus",
-    "mzaonboardingemail-de",
-    "mzaonboardingemail-fr",
-    "mzaonboardingemail-es",
-    "mzaonboardingemail-it",
-    "mzaonboardingemail-nl",
-    "mzaonboardingemail-pl",
-    "firefox-all",
-    "fxshare1",
-    "fxshare2",
-    "fxshare3",
-    "fxshare4",
-    "fxshare5",
-    "fxshare6",
-    "fxshare7",
-    "fxshare8",
-    "fxshare9",
-    "fxshare10",
-    "fxshare11",
-    "fxshare12",
-    "DESKTOP_FEATURE_CALLOUT_SIGNED_INTO_ACCOUNT.treatment_a",
-    "DESKTOP_FEATURE_CALLOUT_SIGNED_INTO_ACCOUNT.treatment_b",
-    "wnp134-de-a",
-    "wnp134-de-b",
-    "wnp134-de-c",
-    "wnp134-en-ca-a",
-    "wnp134-en-ca-b",
-    "wnp134-en-ca-c",
-    "wnp134-en-na-a",
-    "wnp134-en-na-b",
-    "wnp134-en-na-c",
-    "wnp134-en-uk-a",
-    "wnp134-en-uk-b",
-    "wnp134-en-uk-c",
-    "wnp134-fr-a",
-    "wnp134-fr-b",
-    "wnp134-fr-c",
-    "smi-marvintsp",
-    "smi-koschtaaa",
-    "smi-itsmanjuu",
-    "smi-domiip",
-    "smi-shessdly",
-    "smi-bytereview",
-]
+# matches only ASCII letters (ignoring case), numbers, dashes, periods, and underscores.
+PARAM_VALUES_RE = re.compile(r"[\w.-]+", flags=re.ASCII)
+
+FXC = settings.FXC_BASE_URL + "/{_locale}"  # var is named `_locale`` to avoid clashing with `locale`
 
 
 def firefox_mobile_faq(request, *args, **kwargs):
@@ -71,15 +38,205 @@ def firefox_channel(*args, **kwargs):
     return platform_redirector("firefox.channel.desktop", "firefox.channel.android", "firefox.channel.ios")
 
 
+def validate_param_value(param: str | None) -> str | None:
+    """
+    Returns the value passed in if it matches the regex `PARAM_VALUES_RE`.
+    Otherwise returns `None`.
+    """
+    if param and PARAM_VALUES_RE.fullmatch(param):
+        return param
+
+    return None
+
+
 def mobile_app(request, *args, **kwargs):
     c = request.GET.get("campaign")
     p = request.GET.get("product")
-    campaign = c if c in CAMPAIGN_OPTIONS else None
+    campaign = validate_param_value(c)
     product = p if p in PRODUCT_OPTIONS else "firefox"
     return mobile_app_redirector(request, product, campaign)
 
 
-redirectpatterns = (
+# All redirects in this file will get the `redirect_source` query parameter set to `mozilla-org`.
+offsite_redirect = partial(
+    redirect,
+    query={"redirect_source": "mozilla-org"},  # additional querystring to add to every redirection
+    merge_query=True,  # ensure we don't lose existing querystrings during redirection
+)
+
+
+def _redirect_to_same_path_on_fxc(request, *args, **kwargs):
+    """Returns the same path but on the Firefox domain.
+
+    Note that this is meant to be called from the offsite_redirect helper,
+    which has merge_query enabled and also adds on the redirect_source
+    querystring, so we don't need to explicitly [re]set the querystring in the
+    URL we return.
+    """
+    return f"{settings.FXC_BASE_URL}{request.path}"
+
+
+releasenotes_redirectpatterns = (
+    # Special-case redirects that existed before the Bedrock->Springfield redirects;
+    # pulled together here in one place
+    offsite_redirect(
+        # issue 14467; 16381
+        r"^firefox/125\.0/releasenotes/?$",
+        f"{settings.FXC_BASE_URL}/firefox/125.0.1/releasenotes/",
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        r"^firefox/38\.0\.3/releasenotes/$",
+        f"{settings.FXC_BASE_URL}/firefox/38.0.5/releasenotes/",
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    # Redirects from Bedrock to Springfield in general
+    offsite_redirect(
+        f"^firefox/(?:{platform_re}/)?(?:{channel_re}/)?notes/$",
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        "firefox/nightly/notes/feed/",
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        "firefox/(?:latest/)?releasenotes/$",
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        "firefox/android/releasenotes/",
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        "firefox/ios/releasenotes/",
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        f"^firefox/(?:{platform_re}/)?(?:{channel_re}/)?system-requirements/$",
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        releasenotes_re,
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        android_releasenotes_re,
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        ios_releasenotes_re,
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        sysreq_re,
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        android_sysreq_re,
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        ios_sysreq_re,
+        _redirect_to_same_path_on_fxc,
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+    offsite_redirect(
+        "firefox/releases/$",
+        f"{settings.FXC_BASE_URL}/releases/",  # leave Springfield to sort out the local redirect
+        permanent=settings.MAKE_RELNOTES_REDIRECTS_PERMANENT,
+    ),
+)
+
+# Issue 16355
+springfield_redirectpatterns = (
+    offsite_redirect(r"^firefox/$", f"{FXC}/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/$", f"{FXC}/", permanent=True),
+    offsite_redirect(r"^firefox/new/$", f"{FXC}/", permanent=True),
+    # NOT YET - releasenotes and system requerements should be redirected as a separate piece of work
+    # offsite_redirect(r"^firefox/releasenotes/$", f"{FXC}/firefox/releasenotes/", permanent=True),
+    # offsite_redirect(r"^firefox/system-requirements/$", f"{FXC}/firefox/system-requirements/", permanent=True),
+    offsite_redirect(r"^firefox/all/$", f"{FXC}/download/all/", permanent=True),
+    # NOT YET - releasenotes and system requerements should be redirected as a separate piece of work
+    # offsite_redirect(r"^firefox/android/releasenotes/$", f"{FXC}/firefox/android/releasenotes/", permanent=True),
+    # offsite_redirect(r"^firefox/android/system-requirements/$", f"{FXC}/firefox/android/system-requirements/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/best-browser/$", f"{FXC}/more/best-browser/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/browser-history/$", f"{FXC}/more/browser-history/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/chromebook/$", f"{FXC}/browsers/desktop/chromebook/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/compare/$", f"{FXC}/compare/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/compare/brave/$", f"{FXC}/compare/brave/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/compare/chrome/$", f"{FXC}/compare/chrome/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/compare/edge/$", f"{FXC}/compare/edge/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/compare/opera/$", f"{FXC}/compare/opera/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/compare/safari/$", f"{FXC}/compare/safari/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/incognito-browser/$", f"{FXC}/more/incognito-browser/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/mobile/$", f"{FXC}/browsers/mobile/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/mobile/android/$", f"{FXC}/browsers/mobile/android/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/mobile/focus/$", f"{FXC}/browsers/mobile/focus/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/mobile/ios/$", f"{FXC}/browsers/mobile/ios/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/update-your-browser/$", f"{FXC}/more/update-your-browser/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/what-is-a-browser/$", f"{FXC}/more/what-is-a-browser/", permanent=True),
+    offsite_redirect(r"^firefox/browsers/windows-64-bit/$", f"{FXC}/more/windows-64-bit/", permanent=True),
+    # For now let's leave the /firefox/channel/ redirect happen on www.m.o and then just redirect the resulting
+    # destination, which is the android/desktop/ios version of the URL that follows
+    # https://www.mozilla.org/en-US/firefox/channel/	redirects to /channel/{platform}	(Redirects)	redirect to /channel/{platform}
+    offsite_redirect(r"^firefox/channel/android/$", f"{FXC}/channel/android/", permanent=True),
+    offsite_redirect(r"^firefox/channel/desktop/$", f"{FXC}/channel/desktop/", permanent=True),
+    offsite_redirect(r"^firefox/channel/ios/$", f"{FXC}/channel/ios/", permanent=True),
+    offsite_redirect(r"^firefox/developer/$", f"{FXC}/channel/desktop/developer/", permanent=True),
+    offsite_redirect(r"^firefox/download/thanks/$", f"{FXC}/thanks/", permanent=True),
+    offsite_redirect(r"^firefox/enterprise/$", f"{FXC}/browsers/enterprise/", permanent=True),
+    offsite_redirect(r"^firefox/faq/$", f"{FXC}/more/faq/", permanent=True),
+    offsite_redirect(r"^firefox/features/$", f"{FXC}/features/", permanent=True),
+    offsite_redirect(r"^firefox/features/adblocker/$", f"{FXC}/features/adblocker/", permanent=True),
+    offsite_redirect(r"^firefox/features/add-ons/$", f"{FXC}/features/add-ons/", permanent=True),
+    offsite_redirect(r"^firefox/features/block-fingerprinting/$", f"{FXC}/features/block-fingerprinting/", permanent=True),
+    offsite_redirect(r"^firefox/features/bookmarks/$", f"{FXC}/features/bookmarks/", permanent=True),
+    offsite_redirect(r"^firefox/features/customize/$", f"{FXC}/features/customize/", permanent=True),
+    offsite_redirect(r"^firefox/features/eyedropper/$", f"{FXC}/features/eyedropper/", permanent=True),
+    offsite_redirect(r"^firefox/features/fast/$", f"{FXC}/features/fast/", permanent=True),
+    offsite_redirect(r"^firefox/features/password-manager/$", f"{FXC}/features/password-manager/", permanent=True),
+    offsite_redirect(r"^firefox/features/pdf-editor/$", f"{FXC}/features/pdf-editor/", permanent=True),
+    offsite_redirect(r"^firefox/features/picture-in-picture/$", f"{FXC}/features/picture-in-picture/", permanent=True),
+    offsite_redirect(r"^firefox/features/pinned-tabs/$", f"{FXC}/features/pinned-tabs/", permanent=True),
+    offsite_redirect(r"^firefox/features/private-browsing/$", f"{FXC}/features/private-browsing/", permanent=True),
+    offsite_redirect(r"^firefox/features/private/$", f"{FXC}/features/private/", permanent=True),
+    offsite_redirect(r"^firefox/features/sync/$", f"{FXC}/features/sync/", permanent=True),
+    offsite_redirect(r"^firefox/features/tips/$", f"{FXC}/features/tips/", permanent=True),
+    offsite_redirect(r"^firefox/features/translate/$", f"{FXC}/features/translate/", permanent=True),
+    offsite_redirect(r"^firefox/installer-help/$", f"{FXC}/download/installer-help/", permanent=True),
+    # NOT YET - releasenotes and system requerements should be redirected as a separate piece of work
+    # offsite_redirect(r"^firefox/ios/releasenotes/$", f"{FXC}/firefox/ios/releasenotes/", permanent=True),
+    # offsite_redirect(r"^firefox/ios/system-requirements/$", f"{FXC}/firefox/ios/system-requirements/", permanent=True),
+    offsite_redirect(r"^firefox/ios/testflight/$", f"{FXC}/channel/ios/testflight/", permanent=True),
+    offsite_redirect(r"^firefox/linux/$", f"{FXC}/browsers/desktop/linux/", permanent=True),
+    offsite_redirect(r"^firefox/mac/$", f"{FXC}/browsers/desktop/mac/", permanent=True),
+    offsite_redirect(r"^firefox/mobile/get-app/$", f"{FXC}/browsers/mobile/get-app/", permanent=True),
+    offsite_redirect(r"^firefox/more/$", f"{FXC}/more/", permanent=True),
+    # NOT YET - releasenotes and system requerements should be redirected as a separate piece of work
+    # offsite_redirect(r"^firefox/releases/$", f"{FXC}/releases/", permanent=True),
+    offsite_redirect(r"^firefox/set-as-default/$", f"{FXC}/landing/set-as-default/", permanent=True),
+    offsite_redirect(r"^firefox/set-as-default/thanks/$", f"{FXC}/landing/set-as-default/thanks/", permanent=True),
+    offsite_redirect(r"^firefox/unsupported-systems/$", f"{FXC}/browsers/unsupported-systems/", permanent=True),
+    offsite_redirect(r"^firefox/windows/$", f"{FXC}/browsers/desktop/windows/", permanent=True),
+    # DO NOT REDIRECT firefox/landing/get/ yet - it's the target for paid ads, etc. There's
+    # a dedicated URL on www.firefox.com that newer campaigns can send traffic to.
+    # offsite_redirect(r"^firefox/landing/get/$", f"{FXC}/landing/get", permanent=True),
+    # DO NOT REDIRECT YET: page has not been ported to Springfield
+    # offsite_redirect(r"^firefox/switch/", f"{FXC}/landing/switch/", permanent=True),
+)
+
+bedrock_redirectpatterns = (
     # overrides
     # issue 8096
     redirect(r"^firefox/beta/all/?$", "firefox.all.platforms", to_args=["desktop-beta"]),
@@ -129,16 +286,16 @@ redirectpatterns = (
     redirect(r"^firefoxos", "/firefox/os/"),
     # bug 1438302
     no_redirect(r"^firefox/download/thanks/?$"),
-    # Bug 1006616
-    redirect(r"^download/?$", "firefox.new"),
-    # Bug 1409554
-    redirect(r"^(firefox|mobile)/download", "firefox.new"),
+    # Bug 1006616; Issue 16431
+    redirect(r"^download/?$", f"{FXC}/"),
+    # Bug 1409554; Issue 16431
+    redirect(r"^(firefox|mobile)/download", f"{FXC}/"),
     # bug 837883
     redirect(r"^firefox/firefox\.exe$", "mozorg.home", re_flags="i"),
     # bug 821006
     redirect(r"^firefox/all(\.html)?$", "firefox.all"),
-    # bug 727561
-    redirect(r"^firefox/search(?:\.html)?$", "firefox.new"),
+    # bug 727561; Issue 16431
+    redirect(r"^firefox/search(?:\.html)?$", f"{FXC}/"),
     # bug 860865, 1101220, issue 8096
     redirect(r"^firefox/all-(?:beta|rc)(?:/|\.html)?$", "firefox.all.platforms", to_args=["desktop-beta"]),
     redirect(r"^firefox/all-aurora(?:/|\.html)?$", "firefox.all.platforms", to_args=["desktop-developer"]),
@@ -146,14 +303,14 @@ redirectpatterns = (
     redirect(r"^firefox/organizations/all\.html$", "firefox.all.platforms", to_args=["desktop-esr"]),
     # bug 729329
     redirect(r"^mobile/sync", "firefox.features.sync"),
-    # bug 882845
-    redirect(r"^firefox/toolkit/download-to-your-devices", "firefox.new"),
+    # bug 882845; Issue 16431
+    redirect(r"^firefox/toolkit/download-to-your-devices", f"{FXC}/"),
     # bug 1014823
     redirect(r"^(products/)?firefox/releases/whatsnew/?$", "firefox.whatsnew"),
-    # bug 929775
+    # bug 929775; Issue 16431
     redirect(
         r"^firefox/update",
-        "firefox.new",
+        f"{FXC}/",
         query={
             "utm_source": "firefox-browser",
             "utm_medium": "firefox-browser",
@@ -163,30 +320,30 @@ redirectpatterns = (
     # Bug 868182, 986174
     redirect(r"^(m|(firefox/)?mobile)/features/?$", "firefox.browsers.mobile.index"),
     redirect(r"^(m|(firefox/)?mobile)/faq/?$", firefox_mobile_faq, query=False),
-    # bug 884933
+    # bug 884933; Issue 16431
     redirect(r"^(m|(firefox/)?mobile)/platforms/?$", "https://support.mozilla.org/kb/will-firefox-work-my-mobile-device"),
-    redirect(r"^m/?$", "firefox.new"),
-    # Bug 730488 deprecate /firefox/all-older.html
-    redirect(r"^firefox/all-older\.html$", "firefox.new"),
+    redirect(r"^m/?$", f"{FXC}/"),
+    # Bug 730488 deprecate /firefox/all-older.html; Issue 16431
+    redirect(r"^firefox/all-older\.html$", f"{FXC}/"),
     # bug 1120658
     redirect(r"^seamonkey-transition\.html$", "http://www-archive.mozilla.org/seamonkey-transition.html"),
     # Bug 1186373
     redirect(r"^firefox/hello/npssurvey/?$", "https://www.surveygizmo.com/s3/2227372/Firefox-Hello-Product-Survey", permanent=False),
     # Bug 1221739
     redirect(r"^firefox/hello/feedbacksurvey/?$", "https://www.surveygizmo.com/s3/2319863/d2b7dc4b5687", permanent=False),
-    # Bug 1110927
-    redirect(r"^(products/)?firefox/start/central\.html$", "firefox.new"),
+    # Bug 1110927; Issue 16431
+    redirect(r"^(products/)?firefox/start/central\.html$", f"{FXC}/"),
     redirect(r"^firefox/sync/firstrun\.html$", "firefox.features.sync"),
-    # Bug 920212
-    redirect(r"^firefox/fx(/.*)?", "firefox"),
+    # Bug 920212; Issue 16431
+    redirect(r"^firefox/fx(/.*)?", f"{FXC}/"),
     # Bug 979531, 1003727, 979664, 979654, 979660
     redirect(r"^firefox/customize/?$", "https://support.mozilla.org/kb/customize-firefox-controls-buttons-and-toolbars"),
     redirect(r"^firefox/(?:performance|happy|speed|memory)/?$", "firefox.features.fast"),
     redirect(r"^firefox/security/?$", "firefox.features.private"),
     redirect(r"^firefox/technology/?$", "https://developer.mozilla.org/docs/Tools"),
     # Previously Bug 979527 / Github #10004 "Getting Started" Page
-    redirect(r"^(products/)?firefox/central(/|\.html|-lite\.html)?$", "firefox"),
-    # bug 868169
+    redirect(r"^(products/)?firefox/central(/|\.html|-lite\.html)?$", f"{FXC}/"),
+    # bug 868169; Issue 16431
     redirect(r"^mobile/android-download\.html$", "https://play.google.com/store/apps/details", query={"id": "org.mozilla.firefox"}, merge_query=True),
     redirect(
         r"^mobile/android-download-beta\.html$",
@@ -246,15 +403,15 @@ redirectpatterns = (
         r"/(?P<channel>release|aurora)notes/(?P<page>[\/\w\.-]+)?$",
         "http://website-archive.mozilla.org/www.mozilla.org/firefox_releasenotes/en-US/{prod}/{vers}/{channel}notes/{page}",
     ),
-    # bug 767614 superceeded by bug 957711 and 1003718 and 1239960
-    redirect(r"^(fennec)/?$", "firefox"),
+    # bug 767614 superceeded by bug 957711 and 1003718 and 1239960; Issue 16431
+    redirect(r"^(fennec)/?$", f"{FXC}/"),
     # issue 8749
     redirect(r"^(mobile)/?$", "firefox.browsers.mobile.index"),
     # bug 876668
     redirect(r"^mobile/customize(?:/.*)?$", "firefox.browsers.mobile.index"),
-    # bug 1211907
-    redirect(r"^firefox/independent/?$", "firefox.new"),
-    redirect(r"^firefox/personal/?$", "firefox.new"),
+    # bug 1211907; Issue 16431
+    redirect(r"^firefox/independent/?$", f"{FXC}/"),
+    redirect(r"^firefox/personal/?$", f"{FXC}/"),
     # bug 845983
     redirect(r"^metrofirefox(?P<path>/.*)?$", "/firefox{path}"),
     # bug 1003703, 1009630
@@ -270,8 +427,8 @@ redirectpatterns = (
     ),
     # bug 960543
     redirect(r"^firefox/(?P<vers>[23])\.0/eula", "/legal/eula/firefox-{vers}/"),
-    # bug 1150713
-    redirect(r"^firefox/sms(?:/.*)?$", "firefox"),
+    # bug 1150713; Issue 16431
+    redirect(r"^firefox/sms(?:/.*)?$", f"{FXC}/"),
     # Redirects for SeaMonkey project website, now living at seamonkey-project.org
     redirect(r"^projects/seamonkey/$", "http://www.seamonkey-project.org/"),
     redirect(r"^projects/seamonkey/artwork\.html$", "http://www.seamonkey-project.org/dev/artwork"),
@@ -303,10 +460,10 @@ redirectpatterns = (
     # Bug 424204
     redirect(r"^firefox/help/?$", "https://support.mozilla.org/"),
     redirect(r"^fxandroid/?$", "firefox.browsers.mobile.android"),
-    # Bug 1255882
-    redirect(r"^firefox/personal", "firefox.new"),
-    redirect(r"^firefox/upgrade", "firefox.new"),
-    redirect(r"^firefox/ie", "firefox.new"),
+    # Bug 1255882; Issue 16431
+    redirect(r"^firefox/personal", f"{FXC}/"),
+    redirect(r"^firefox/upgrade", f"{FXC}/"),
+    redirect(r"^firefox/ie", f"{FXC}/"),
     # must go above the bug 1255882 stuff below
     redirect(r"^projects/xul/joy-of-xul\.html$", "https://developer.mozilla.org/docs/Mozilla/Tech/XUL/The_Joy_of_XUL"),
     redirect(r"^projects/xul/xre(old)?\.html$", "https://developer.mozilla.org/docs/Archive/Mozilla/XULRunner"),
@@ -434,16 +591,18 @@ redirectpatterns = (
     redirect(r"^quality(/.*)?$", "http://quality.mozilla.org/"),
     # Bug 654614 /blocklist -> addons.m.o/blocked
     redirect(r"^blocklist(/.*)?$", "https://addons.mozilla.org/blocked/"),
-    redirect(r"^products/firebird/compare/?$", "firefox.new"),
-    redirect(r"^products/firebird/?$", "firefox"),
-    redirect(r"^products/firebird/download/$", "firefox.new"),
+    # Issue 16431
+    redirect(r"^products/firebird/compare/?$", f"{FXC}/"),
+    redirect(r"^products/firebird/?$", f"{FXC}/"),
+    redirect(r"^products/firebird/download/$", f"{FXC}/"),
     redirect(r"^products/firefox/add-engines\.html$", "https://addons.mozilla.org/search-engines.php"),
     redirect(r"^products/firefox/all$", "/firefox/all/"),
     redirect(r"^products/firefox/all\.html$", "/firefox/all/"),
     redirect(r"^products/firefox/banners\.html$", "/contribute/friends/"),
     redirect(r"^products/firefox/buttons\.html$", "/contribute/friends/"),
-    redirect(r"^products/firefox/download", "firefox.new"),
-    redirect(r"^products/firefox/get$", "firefox.new"),
+    # Issue 16431
+    redirect(r"^products/firefox/download", f"{FXC}/"),
+    redirect(r"^products/firefox/get$", f"{FXC}/"),
     redirect(r"^products/firefox/live-bookmarks", "/firefox/features/"),
     redirect(r"^products/firefox/mirrors\.html$", "http://www-archive.mozilla.org/mirrors.html"),
     redirect(r"^products/firefox/releases/$", "/firefox/releases/"),
@@ -459,21 +618,24 @@ redirectpatterns = (
     redirect(r"^products/firefox/shelf\.html$", "https://blog.mozilla.org/press/awards/"),
     redirect(r"^products/firefox/smart-keywords\.html$", "https://support.mozilla.org/en-US/kb/Smart+keywords"),
     redirect(r"^products/firefox/support/$", "https://support.mozilla.org/"),
-    redirect(r"^products/firefox/switch", "firefox.new"),
+    # Issue 16431
+    redirect(r"^products/firefox/switch", f"{FXC}/"),
     redirect(r"^products/firefox/system-requirements", "/firefox/system-requirements/"),
-    redirect(r"^products/firefox/tabbed-browsing", "firefox"),
+    # Issue 16431
+    redirect(r"^products/firefox/tabbed-browsing", f"{FXC}/"),
     redirect(r"^products/firefox/text-zoom\.html$", "https://support.mozilla.org/kb/font-size-and-zoom-increase-size-of-web-pages"),
     redirect(r"^products/firefox/themes$", "https://addons.mozilla.org/themes/"),
     redirect(r"^products/firefox/themes\.html$", "https://addons.mozilla.org/themes/"),
     redirect(r"^products/firefox/ui-customize\.html$", "https://support.mozilla.org/kb/customize-firefox-controls-buttons-and-toolbars"),
-    redirect(r"^products/firefox/upgrade", "firefox.new"),
-    redirect(r"^products/firefox/why/$", "firefox"),
+    # Issue 16431
+    redirect(r"^products/firefox/upgrade", f"{FXC}/"),
+    redirect(r"^products/firefox/why/$", f"{FXC}/"),
     # bug 857246 redirect /products/firefox/start/  to start.mozilla.org
     redirect(r"^products/firefox/start/?$", "http://start.mozilla.org"),
     # issue 9008
     redirect(r"^products/firefox(/.*)?$", "products.landing"),
-    # bug 1260423
-    redirect(r"^firefox/choose/?$", "firefox.new"),
+    # bug 1260423; Issue 16431
+    redirect(r"^firefox/choose/?$", f"{FXC}/"),
     # bug 1288552 - redirect /secondrun/ traffic from funnelcake test
     redirect(r"^firefox(?:\/\d+\.\d+(?:\.\d+)?(?:a\d+)?)?/secondrun(?:/.*)?", "firefox.browsers.mobile.index", query=False),
     # bug 1293539
@@ -505,8 +667,8 @@ redirectpatterns = (
             "utm_content": "windows10-welcome-tab",
         },
     ),
-    # bug 1369732
-    redirect(r"^Firefox/?$", "firefox"),
+    # bug 1369732; Issue 16431
+    redirect(r"^Firefox/?$", f"{FXC}/"),
     # bug 1386112
     redirect(r"^firefox/android/faq/?", "https://support.mozilla.org/products/mobile"),
     # bug 1392796
@@ -521,12 +683,11 @@ redirectpatterns = (
     redirect(r"^firefox/(new/)?addon", "https://addons.mozilla.org"),
     redirect(r"^firefox/tips", "firefox.features.tips"),
     redirect(r"^firefox/new/.+", "/firefox/new/"),
-    redirect(r"^firefox/38\.0\.3/releasenotes/$", "/firefox/38.0.5/releasenotes/"),
     redirect(r"^firefox/default\.htm", "/firefox/"),
     redirect(r"^firefox/android/(?P<version>\d+\.\d+(?:\.\d+)?)$", "/firefox/android/{version}/releasenotes/"),
     redirect(r"^firefox/stats/", "/firefox/"),
-    # bug 1416706
-    redirect(r"^firefox/desktop/?", "firefox.new"),
+    # bug 1416706; Issue 16431
+    redirect(r"^firefox/desktop/?", f"{FXC}/browsers/desktop/"),
     # bug 1418500
     redirect(r"^firefox/android/?$", "firefox.browsers.mobile.android"),
     redirect(r"^firefox/focus/?$", "firefox.browsers.mobile.focus"),
@@ -553,21 +714,22 @@ redirectpatterns = (
     # bug 1428783
     redirect(r"^firefox/dnt/?$", "https://support.mozilla.org/kb/how-do-i-turn-do-not-track-feature"),
     # issue 6209
-    redirect(r"^pocket/?", "/firefox/pocket/"),
+    redirect(r"^pocket/?", "https://getpocket.com/"),
+    # issue 16358
+    redirect(r"^firefox/pocket/?", "https://getpocket.com/"),
     # issue 6186
     redirect(r"^vote/?", "/firefox/election/"),
     # issue 9391
-    redirect(r"^/firefox/election/?$", "firefox"),
+    redirect(r"^/firefox/election/?$", f"{FXC}/"),
     # fxa
     redirect(r"^firefox/accounts/features/?", "mozorg.account"),
     # bug 1577449
     redirect(r"^firefox/features/send-tabs/?", "https://support.mozilla.org/kb/send-tab-firefox-desktop-other-devices"),
     # issue 6512
-    redirect(r"^firefox/firefox\.html$", "firefox.new"),
+    redirect(r"^firefox/firefox\.html$", f"{FXC}/"),
     # issue 6979
-    redirect(r"^firefoxfightsforyou/?", "firefox"),
+    redirect(r"^firefoxfightsforyou/?", f"{FXC}/"),
     # issue 14240
-    redirect(r"^/exp/firefox/accounts/?$", "mozorg.account"),
     redirect(r"^firefox/accounts/?$", "mozorg.account"),
     # issue 7210
     redirect(r"^firefox/account/?$", "mozorg.account"),
@@ -575,8 +737,8 @@ redirectpatterns = (
     redirect(r"^firefox/feedback/?$", "https://support.mozilla.org/questions/new/desktop"),
     # issue 7491
     redirect(r"^firefox/organizations/?$", "firefox.enterprise.index"),
-    # issue 7670
-    redirect(r"^/firefox/fights-for-you/?", "firefox"),
+    # issue 7670; Issue 16431
+    redirect(r"^/firefox/fights-for-you/?", f"{FXC}/"),
     # issue #7424
     redirect(r"^firefox(?:\/\d+\.\d+(?:\.\d+)?(?:a\d+)?)?/content-blocking/start/?$", "https://support.mozilla.org/kb/content-blocking"),
     # issue #7424
@@ -590,28 +752,25 @@ redirectpatterns = (
     # issue 8641
     redirect(r"^/firefox/windows-64-bit/?$", "firefox.browsers.windows-64-bit"),
     redirect(r"^/firefox/best-browser/?$", "firefox.browsers.best-browser"),
-    # Unfck campaign, issue 11613
-    redirect(r"^firefox/unfu?ck/?$", "firefox"),
-    redirect(r"^firefox/love/?$", "firefox"),
-    redirect(r"^firefox/liebe/?$", "firefox"),
-    redirect(r"^firefox/rendonslenetplusnet/?$", "firefox"),
-    redirect(r"^(unfu?ck|love|liebe|rendonslenetplusnet)/?$", "firefox"),
-    # issue 9148
-    redirect(r"^/firefox/campaign/?$", "firefox.new"),
+    # Unfck campaign, issue 11613; Issue 16431
+    redirect(r"^firefox/unfu?ck/?$", f"{FXC}/"),
+    redirect(r"^firefox/love/?$", f"{FXC}/"),
+    redirect(r"^firefox/liebe/?$", f"{FXC}/"),
+    redirect(r"^firefox/rendonslenetplusnet/?$", f"{FXC}/"),
+    redirect(r"^(unfu?ck|love|liebe|rendonslenetplusnet)/?$", f"{FXC}/"),
+    # issue 9148; Issue 16431
+    redirect(r"^/firefox/campaign/?$", f"{FXC}/"),
     # issue 9788
     redirect(r"^/firefox/enterprise/signup(/.*)?$", "firefox.enterprise.index"),
     # issue 9953
     redirect(r"^/firefox/features/pip/?$", "firefox.features.picture-in-picture"),
     # issue 10182
     redirect(r"^/firefox/mobile/?$", "firefox.browsers.mobile.index"),
-    redirect(r"^/exp/firefox/mobile/?$", "firefox.browsers.mobile.index"),
     # issue 10292, 10590
     redirect(r"^firefox/(?P<version>[^/]+)/whatsnew/(india|africa|france|en|all|china)/?$", "/firefox/{version}/whatsnew/"),
     redirect(r"^firefox/whatsnew/(india|africa|france|en|all|china)/?$", "firefox.whatsnew"),
     # issue 10703
     redirect(r"firefox/lockwise/?", "https://support.mozilla.org/kb/end-of-support-firefox-lockwise"),
-    # issue 10879
-    redirect(r"^/exp/?$", "mozorg.home"),
     # issue 12107
     redirect(r"^/firefox/families/?$", "firefox.family.index"),
     redirect(r"^firefox/features/memory/?$", "firefox.features.fast"),
@@ -623,10 +782,10 @@ redirectpatterns = (
     redirect(r"^firefox/mobile/get-app/?$", "firefox.browsers.mobile.get-app"),
     # issue 14172
     redirect(r"^firefox/browsers/mobile/app/?$", mobile_app, cache_timeout=0, query=False),
-    # issue 14231
-    redirect(r"^firefox/flashback/?$", "firefox"),
-    # issue 14222
-    redirect(r"^firefox/browsers/?$", "firefox"),
+    # issue 14231; Issue 16431
+    redirect(r"^firefox/flashback/?$", f"{FXC}/"),
+    # issue 14222; Issue 16431
+    redirect(r"^firefox/browsers/?$", f"{FXC}/"),
     # issue 14248
     redirect(r"^firefox/privacy/?$", "privacy"),
     redirect(r"^firefox/privacy/products/?$", "products.landing"),
@@ -635,4 +794,8 @@ redirectpatterns = (
     redirect(r"^firefox/nothingpersonal/?$", "firefox.nothing-personal.index"),
     # issue 15841
     redirect(r"^firefox/tech/?$", "firefox.landing.tech"),
+    # issue 16089, 16159
+    redirect(r"^/firefox/?$", f"{FXC}/"),
 )
+
+redirectpatterns = releasenotes_redirectpatterns + bedrock_redirectpatterns + springfield_redirectpatterns

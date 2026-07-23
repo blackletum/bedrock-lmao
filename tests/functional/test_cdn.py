@@ -62,9 +62,9 @@ def get_ssllabs_results(base_url):
     "url",
     (
         "/",
-        "/firefox/",
-        "/firefox/new/",
         "/about/",
+        "/products/",
+        "/privacy/",
     ),
 )
 @pytest.mark.nondestructive
@@ -117,7 +117,7 @@ def test_query_params(base_url):
 @pytest.mark.cdn
 @pytest.mark.nondestructive
 def test_cdn_cache(base_url):
-    full_url = "{}/{}{}".format(base_url, "en-US", "/firefox/new/")
+    full_url = "{}/{}{}".format(base_url, "en-US", "/products/")
 
     # hit the url once to make sure the cache is warm
     resp = requests.get(full_url, timeout=5)
@@ -132,6 +132,8 @@ def test_cdn_cache(base_url):
 @pytest.mark.nondestructive
 @pytest.mark.parametrize("version", supported_versions, ids=itemgetter(0))
 def test_enabled_protocols(version, get_ssllabs_results):
+    if not get_ssllabs_results:
+        pytest.xfail("SSL scan results are not available")
     supported_protocols = get_ssllabs_results[0]["endpoints"][0]["details"]["protocols"]
     found = False
     for prot in supported_protocols:
@@ -144,6 +146,8 @@ def test_enabled_protocols(version, get_ssllabs_results):
 @pytest.mark.nondestructive
 @pytest.mark.parametrize("version", unsupported_versions, ids=itemgetter(0))
 def test_disabled_protocols(version, get_ssllabs_results):
+    if not get_ssllabs_results:
+        pytest.xfail("SSL scan results are not available")
     supported_protocols = get_ssllabs_results[0]["endpoints"][0]["details"]["protocols"]
     found = False
     for prot in supported_protocols:
@@ -156,6 +160,8 @@ def test_disabled_protocols(version, get_ssllabs_results):
 @pytest.mark.nondestructive
 @pytest.mark.parametrize("cipher", ciphers, ids=itemgetter(0))
 def test_enabled_ciphers(cipher, get_ssllabs_results):
+    if not get_ssllabs_results:
+        pytest.xfail("SSL scan results are not available")
     supported_suite = get_ssllabs_results[0]["endpoints"][0]["details"]["suites"]["list"]
     found = False
     for cipher_description in supported_suite:
@@ -169,6 +175,8 @@ def test_enabled_ciphers(cipher, get_ssllabs_results):
 @pytest.mark.nondestructive
 def test_tls(get_ssllabs_results):
     """Check get_ssllabs_results to make sure that all expected clients connected without issue"""
+    if not get_ssllabs_results:
+        pytest.xfail("SSL scan results are not available")
     data = get_ssllabs_results
 
     errors = 0

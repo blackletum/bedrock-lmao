@@ -27,14 +27,14 @@ privacy-firefox-firefox-protects-you = { -brand-name-firefox } protects you from
 privacy-firefox-privacy-that-works = Privacy that works for you
 privacy-firefox-firefox-makes-it = { -brand-name-firefox } makes it easy to manage your data with built-in privacy and security features, plus settings that let you fine-tune your browsing experience.
 privacy-firefox-manage-your-privacy = Manage your privacy settings:
-privacy-firefox-firefox-for-desktop = { -brand-name-firefox } for Desktop
-privacy-firefox-firefox-for-mobile = { -brand-name-firefox } for Mobile
+privacy-firefox-firefox-for-desktop-v2 = { -brand-name-firefox } for desktop
+privacy-firefox-firefox-for-mobile-v2 = { -brand-name-firefox } for mobile
 
+# heading for the table of contents, a shorter heading is better
+privacy-firefox-contents = Contents
 # Variables:
 #   $attrs (string) - in-page link to the start of the legal portion of the privacy notice
 privacy-firefox-take-me-back = Take me <a { $attrs }>back to the top</a> of the Privacy Notice
 # Variables:
 #   $attrs (string) - in-page link to the top of the page
 privacy-firefox-lost-in-the = Lost in the details? Get back to the <a { $attrs }>{ -brand-name-firefox } privacy basics</a>.
-# links to Mozilla privacy policy
-privacy-firefox-mozilla-privacy = { -brand-name-mozilla } Privacy

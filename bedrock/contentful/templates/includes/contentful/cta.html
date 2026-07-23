@@ -16,7 +16,7 @@
 
 {% elif action == 'Explore Firefox' %}
 
-  <a href="{{ url('firefox') }}" class="mzp-c-button {{ button_class }}" data-cta-text="{{ cta_text }}" >{{ label }}</a>
+  <a href="https://www.firefox.com/" class="mzp-c-button {{ button_class }}" data-cta-text="{{ cta_text }}" >{{ label }}</a>
 
 {% elif action == 'Create a Firefox Account' %}
 
@@ -27,10 +27,6 @@
     optional_parameters={'utm_campaign': utm_campaign, 'utm_content': 'firefox-sync-' + utm_content },
     optional_attributes={'data-cta-text': cta_text, 'data-cta-type': 'fxa-sync'}
   ) }}
-
-{% elif action == 'Get Pocket' %}
-
-  <a href="https://getpocket.com/{{ referral|safe }}" class="mzp-c-button {{ button_class }}" rel="external noopener" data-cta-text="{{ cta_text }}" data-cta-type="pocket">{{ label }}</a>
 
 {% elif action == 'Get Mozilla VPN' %}
 
