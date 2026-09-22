@@ -217,3 +217,57 @@
   </div>
 </{{ tag }}>
 {%- endmacro %}
+
+{#
+  Tabs
+  HTML Import: {% from "macros-m24.html" import tabs with context %}
+  CSS Import: css_bundle('m24-tabs')
+  JS Import: js_bundle('m24-tabs')
+
+  Renders an accessible tabs widget (WAI-ARIA APG tabs pattern) around body
+  content supplied via the {% call %} block. All ARIA roles/states are added
+  by the JS at runtime (see media/js/base/protocol/m24-tabs.es6.js) — with JS
+  disabled, or in unsupported browsers, the tab list degrades to a row of
+  in-page jump links.
+
+  Macro Parameters:
+    items (Required): List of dicts, one per tab, in display order:
+      id: String matching the `id` attribute of that tab's panel element,
+        which must be written by hand in the {% call %} block body.
+      label: String tab label (usually a translation id wrapped in ftl function).
+    aria_label (Required): String accessible name for the tab list itself
+      (e.g. "Product categories"), since there's no visible label pointing
+      at it. Usually a translation id wrapped in an ftl function.
+
+  Usage:
+    {% call tabs(
+      aria_label=ftl('firefox-products-tabs-aria-label'),
+      items=[
+        {'id': 'products-panel', 'label': ftl('firefox-products-tabs-consumer')},
+        {'id': 'business-panel', 'label': ftl('firefox-products-tabs-business')}
+      ]
+    ) %}
+      <section id="products-panel" class="m24-c-tabs-panel">
+        <h2 class="m24-c-tabs-panel-heading">{{ ftl('firefox-products-tabs-consumer') }}</h2>
+        ...
+      </section>
+      <section id="business-panel" class="m24-c-tabs-panel">
+        <h2 class="m24-c-tabs-panel-heading">{{ ftl('firefox-products-tabs-business') }}</h2>
+        ...
+      </section>
+    {% endcall %}
+#}
+{% macro tabs(items, aria_label) -%}
+<div class="m24-c-tabs m24-c-tabs-is-basic">
+  <ul class="m24-c-tabs-list mzp-l-content mzp-t-content-nospace" aria-label="{{ aria_label }}">
+    {% for item in items %}
+    <li class="m24-c-tabs-item">
+      <a class="m24-c-tabs-link" id="{{ item.id }}-tab" href="#{{ item.id }}">{{ item.label }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="m24-c-tabs-panels">
+    {{ caller() }}
+  </div>
+</div>
+{%- endmacro %}
