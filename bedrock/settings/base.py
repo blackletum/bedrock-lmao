@@ -2793,6 +2793,8 @@ _allowed_page_models = [
     "anonym.AnonymContactPage",
     "mozorg.HomePage",
     "mozorg.AboutUsPage",
+    "mozorg.FreeformPage",
+    "mozorg.ArticlePage",
     "mozorg.LeadershipProfileSnippet",
     "mozorg.OrganizationLeadershipIndexPage",
     "mozorg.OrganizationLeadershipSubpage",
