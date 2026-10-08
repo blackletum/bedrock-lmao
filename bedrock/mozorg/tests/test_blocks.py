@@ -19,6 +19,8 @@ from bedrock.cms.tests.conftest import minimal_site  # noqa: F401
 from bedrock.mozorg.blocks import common
 from bedrock.mozorg.fixtures.base_fixtures import get_placeholder_image
 from bedrock.mozorg.fixtures.donate_fixtures import get_donate_test_page, get_donate_variants
+from bedrock.mozorg.fixtures.image_caption_fixtures import get_image_caption_test_page, get_image_caption_variants
+from bedrock.mozorg.fixtures.intro_fixtures import get_intro_test_pages, get_intro_variants
 from bedrock.mozorg.fixtures.prose_fixtures import get_prose_test_page, get_prose_variants
 from bedrock.mozorg.fixtures.showcase_fixtures import get_showcase_test_page, get_showcase_variants
 from bedrock.mozorg.fixtures.showcase_gallery_fixtures import get_showcase_gallery_test_page, get_showcase_gallery_variants
@@ -1102,3 +1104,111 @@ def test_showcase_gallery_block_cta_link_required_when_text_filled():
     invalid_value = ShowcaseGalleryBlockFactory(cta_text="Read more", cta_link__link_to="", tiles__0__image=tile)
     valid_value = ShowcaseGalleryBlockFactory(cta_text="", cta_link__link_to="", tiles__0__image=tile)
     assert_cta_link_required_when_text_filled(block, invalid_value, valid_value)
+
+
+def _serve_soup(page, site, rf, serving_method) -> BeautifulSoup:
+    response = getattr(page, serving_method)(rf.get(page.relative_url(site)))
+    assert response.status_code == 200
+    return BeautifulSoup(response.content, "html.parser")
+
+
+# IntroBlock Tests
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_intro_block_content(minimal_site, rf, serving_method):  # noqa: F811
+    """Each intro renders an <h1> heading and its body only when one is set."""
+    variants = get_intro_variants()
+    test_pages = get_intro_test_pages()
+
+    for variant, test_page in zip(variants, test_pages):
+        value = variant["value"]
+        soup = _serve_soup(test_page, minimal_site, rf, serving_method)
+
+        intros = soup.find_all(class_="m24-c-intro")
+        assert len(intros) == 1
+        intro = intros[0]
+
+        heading = intro.find(class_="m24-c-intro-title")
+        assert heading.name == "h1", f"Expected h1 heading, got {heading.name}"
+        assert heading.get_text() == value["heading"]
+
+        paragraphs = intro.find_all("p")
+        if value["body"]:
+            expected_text = BeautifulSoup(value["body"], "html.parser").get_text()
+            assert expected_text in intro.get_text()
+            for link in BeautifulSoup(value["body"], "html.parser").find_all("a"):
+                assert intro.find("a", href=link["href"]) is not None, f"Expected link to {link['href']}"
+        else:
+            assert paragraphs == [], "Unexpected body paragraph in intro without body"
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_intro_block_attributes(minimal_site, rf, serving_method):  # noqa: F811
+    """Heading size is applied to the heading; background color to the outer wrapper, which has no id."""
+    variants = get_intro_variants()
+    test_pages = get_intro_test_pages()
+
+    for variant, test_page in zip(variants, test_pages):
+        settings = variant["value"]["settings"]
+        soup = _serve_soup(test_page, minimal_site, rf, serving_method)
+
+        heading = soup.find(class_="m24-c-intro-title")
+        expected_classes = ["m24-c-intro-title", settings["heading_size"]] if settings["heading_size"] else ["m24-c-intro-title"]
+        assert heading["class"] == expected_classes
+
+        # .m24-c-intro > .m24-c-content > outer wrapper
+        outer = soup.find(class_="m24-c-intro").parent.parent
+        assert outer.name == "section"
+        assert soup.find(class_="m24-c-intro").name == "div"
+        assert soup.find(class_="m24-c-intro").parent["class"] == ["m24-c-content"]
+        expected_outer_classes = ["m24-c-intro-section"]
+        if settings["background_color"]:
+            expected_outer_classes.append(settings["background_color"])
+        assert outer.get("class") == expected_outer_classes
+        assert outer.get("id") is None
+
+        # The first-child-of-<main> selector in intro.scss doubles the top padding.
+        assert outer.parent.name == "main"
+        assert outer is outer.parent.find(True)
+
+
+def test_intro_block_without_heading_size_renders_x_large():
+    """Intro data saved before heading_size existed falls back to the default (X large)."""
+    block = common.IntroBlock()
+    value = block.to_python({"settings": {"background_color": ""}, "heading": "Legacy intro", "body": ""})
+
+    assert value["settings"]["heading_size"] == ""
+    heading = BeautifulSoup(block.render(value), "html.parser").find(class_="m24-c-intro-title")
+    assert heading["class"] == ["m24-c-intro-title"]
+
+
+# ImageCaptionBlock Tests
+
+
+@pytest.mark.parametrize("serving_method", ("serve", "serve_preview"))
+def test_image_caption_block_content(minimal_site, rf, serving_method):  # noqa: F811
+    """Each image caption renders a <figure> with the image, its alt text and an optional caption."""
+    variants = get_image_caption_variants(get_placeholder_image().id)
+    soup = _serve_soup(get_image_caption_test_page(), minimal_site, rf, serving_method)
+
+    figures = soup.find_all("figure", class_="m24-c-longform-figure")
+    assert len(figures) == len(variants)
+
+    for figure, variant in zip(figures, variants):
+        value = variant["value"]
+        assert figure.parent.get("class") == ["m24-c-longform"]
+
+        image = figure.find("img", class_="m24-c-longform-figure-image")
+        assert image is not None
+        assert image.get("alt") == value["image"]["image_alt"]
+        assert image.get("loading") == "lazy"
+
+        caption = figure.find("figcaption")
+        if value["caption"]:
+            expected = BeautifulSoup(value["caption"], "html.parser")
+            assert expected.get_text() in caption.get_text()
+            assert caption.find("em") is not None
+            assert caption.find("a", href=expected.find("a")["href"]) is not None
+        else:
+            assert caption is None, "Unexpected <figcaption> in image without caption"
