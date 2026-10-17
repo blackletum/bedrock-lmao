@@ -1,9 +1,17 @@
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: docker
     directory: '/'
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 20
     labels:
       - Backend
@@ -11,8 +19,6 @@ updates:
   - package-ecosystem: npm
     directory: '/'
     ignore:
-      # Needs to be kept in sync with glean_parser Python dependency.
-      - dependency-name: '@mozilla/glean'
       # Owned NPM packages that require manual testing.
       - dependency-name: '@mozilla-protocol/core'
       - dependency-name: '@mozmeao/consent-banner'
@@ -31,6 +37,9 @@ updates:
       - dependency-name: 'stylelint-config-standard-scss'
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
     groups:
       frontend:
         dependency-type: production
@@ -50,6 +59,9 @@ updates:
     directory: '/tests/playwright'
     schedule:
       interval: monthly
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
     open-pull-requests-limit: 10
     groups:
       playwright:
