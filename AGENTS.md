@@ -41,7 +41,128 @@ When working on a feature or fix, work on a dedicated branch whose name is prefi
 
 ## Commit & Pull Request Guidelines
 
-Keep commit titles short, imperative, and linked to issues when available (e.g., `Tighten hero metrics (#16595)`). Focus diffs and note migrations, toggles, or telemetry changes. Pull requests should explain intent, list verification steps (`make test`, screenshots), and link to bugs. Flag rollout considerations when touching configuration under `docker/`, `**/migrations/` or monitoring.
+Keep commit titles short, imperative, and linked to issues when available (e.g., `Tighten hero metrics (#16595)`). Focus diffs and note migrations, toggles, or telemetry changes. Flag rollout considerations when touching configuration under `docker/`, `**/migrations/` or monitoring.
+
+### Writing PR descriptions
+
+Keep all four headings from `.github/PULL_REQUEST_TEMPLATE.md`. Answer one that does not
+apply with `n/a` — one word is a complete answer, and inventing content to fill a heading is
+worse than admitting it is empty. Don't end the description with "🤖 Generated with Claude
+Code" or any other generated-by line.
+
+A description directs the reviewer's attention. It does not restate the diff, and it does not
+explain this codebase back to the team that owns it. Check what actually changed
+(`git diff --stat main...`, plus a scan for migrations, fixtures, config, and deletions —
+these are the categories most likely to hide a consequence a stat diff won't show) before
+writing, so the description matches reality.
+
+Take length out of describing the change.
+
+**One-line summary.** One or two sentences: what the change does, and why where the title
+does not already make that obvious. Compress rather than qualify. "Add compact-input class
+for narrower input fields" beats "Add a reusable `.compact-input` CSS class to
+narrow admin number fields that only ever hold a few digits, instead of rendering
+full-width" — 21 words and two subordinate clauses to say less than eight.
+
+**Significant changes and points to review.** Short bullets, most significant first, one
+clause each. Nest a sub-bullet where a consequence needs one; never go past two levels. A
+single sentence is right where the change is one idea, and a short paragraph is right
+where the reviewer needs domain context the diff cannot give — mozmeao/springfield#1813 explains that editors
+keep several "General" WNPs published at once, which is why the filter had to move off the
+slug.
+
+Name a file where the file is the point — "Remove the unused wagtail-admin.scss",
+"Add regenerate_analytics_ids() to cms/blocks.py" — and prefer the bare
+filename when it identifies the thing on its own.
+
+Rejected — mozmeao/springfield#1791 as first drafted:
+
+> - **Page-level validation** (`springfield/cms/models/base.py`) — every sample-rated
+>   Conditional Display block on a page must share the same rate. **This is the most critical
+>   part to review** — it's new validation that runs on every page save across the whole CMS.
+
+Replacement — mozmeao/springfield#1791 as merged:
+
+> - Adds sample_rate field on ConditionalDisplayBlock (DecimalBlock, 0.01-100%).
+> - Multiple components can be displayed based on sample-rate but the sample rate must match.
+>   - Page.clean() now rejects a save if two sample-rated blocks on the same page disagree.
+
+- Say what changed. Add why only where the change does not already imply it.
+- Do not rate your own change. No "low risk", "mechanical", "straightforward", "nothing here
+  is riskier than a CSS tweak", and never a reflexive "this is the most critical part to
+  review" — most PRs have no such thing, and a rating carries nothing a reviewer can act on.
+- Do flag a change that is genuinely high-risk or wide blast radius, in one line, stating its
+  reach as a fact rather than a rating: a data migration, a schema change, something hard to
+  undo, or behaviour that reaches past the scope the summary names. "The copy hook now
+  regenerates these fields on every page copy, of every page type" earns that line.
+  Validation that only fires on the blocks this PR adds does not. When nothing qualifies,
+  say nothing — silence is the normal case.
+- A side-effect worth knowing about but not risky — a duplicate file deleted, a stray
+  reference removed — is a plain bullet like everything else.
+- Fold low-risk, mechanical fallout — updated fixtures, ported static pages, renamed CSS —
+  into its own short item, kept brief and after the substantive bullets, so it doesn't crowd
+  out what the reviewer actually needs to think about.
+- Flag genuine uncertainty about your own work — "I'm not sure this handles the RTL case" —
+  distinct from rating risk. Risk-rating is banned above; naming a real unknown is not, and
+  is often the most useful sentence in the description.
+- Never explain mechanics the team already knows: why no migration was generated, how this
+  project's StreamField subclass behaves, what an existing template loop does.
+- Never describe your own process. Not which approach you tried first, not what a review
+  caught, not that the branch is stacked on another PR. Two things that look similar but are
+  worth keeping: deliberately deferred scope — "Bare template changes for the new layouts
+  (no styles yet)" — and a port's provenance — "Ported from mozmeao/springfield#1570".
+
+**Issue / Bugzilla link.** The full GitHub issue, Jira or Bugzilla URL, or `n/a`. List all of them where a change
+closes more than one, and give the context on a cross-reference: "Follow-up to
+mozmeao/springfield#1813, fixing the issue pointed out by <comment URL>".
+
+**Testing.** What a reviewer does by hand to check this. The one section worth expanding.
+
+- Open with prerequisites where there are any: "Make sure you have GCP/DNT disabled", "get
+  prod DB (or set up a referral hub page with an image on it locally)".
+- Include setup commands a reviewer must run to see the change at all, such as
+  `./manage.py migrate`. Leave out test and lint commands: `pytest`,
+  `npm run jasmine` and `stylelint` only re-check what CI already checked.
+- Give the URL to load. Deep-link to the specific fixture page where there is one, with the
+  expected result after it.
+- One step per thing to verify, phrased as a check — "Check an error displays when two blocks
+  disagree on sample rate", not "set two blocks to different rates → save is rejected, error
+  names both blocks". `- [ ]` checkboxes where the reviewer is working through a list.
+- Ask plainly for a close look when you want one: "Look at this one pretty closely please, it
+  changes the thanks page."
+
+A complete example — mozmeao/springfield#1823, in full, as the shape to aim for:
+
+> ## One-line summary
+>
+> Enforce good practices for image titles and descriptions.
+>
+> ## Significant changes and points to review
+>
+> - Add a new `is_decorative` field `SpringfieldImage`
+> - Make the description field required when an image isn't decorative
+> - Reject image titles that look like file names
+> - Remove Wagtail's default behavior to use the image's file name as the title
+> - Render an empty `alt` attribute for images flagged as decorative
+>
+> ## Issue / Bugzilla link
+>
+> https://mozilla-hub.atlassian.net/browse/WT-1715
+>
+> ## Testing
+>
+> - Edit any image and check the "Image is decorative" checkbox
+> - Load a page that uses the image and verify that it renders an empty `alt` attribute
+> - Upload a new image from a page editor and check that the form doesn't pre-fill the title
+>   field with the image file name
+> - Verify that the form rejects an empty description
+> - Check the "Image is decorative" checkbox and verify that the form accepts an empty
+>   description
+> - Do the same on the multiple image upload form (`/cms-admin/images/multiple/add/`)
+
+166 words. Five bullets, each one clause. Backticks on identifiers, none on prose. No bold,
+no em-dashes, no repo paths, no risk rating, no test commands. Testing is six imperative
+checks an editor could follow without reading the diff.
 
 ## Security & Configuration Tips
 
@@ -55,6 +176,30 @@ Keep commit titles short, imperative, and linked to issues when available (e.g.,
 
 * When planning Wagtail work, remember that <https://docs.wagtail.org/en/7.3/llms.txt> and the full version at <https://docs.wagtail.org/en/7.3/llms-full.txt> contain LLM-appropriate documentation.
 * If the version of Wagtail (not counting patch releases) in `pyproject.toml` doesn't match the version in the LLM-appropriate URLs mentioned, please update this AGENTS.md then load the new info
+
+## m24 CMS blocks
+
+Conventions for the m24 blocks in `bedrock/mozorg/blocks/common.py`, with templates in `bedrock/mozorg/templates/mozorg/cms/blocks/` and styles in `media/css/m24/`:
+
+* Put a block's options in a `<Name>BlockSettings` StructBlock with `icon = "cog"`, `collapsed = True`, `label = "Settings"`, a `label_format` and `form_classname = "compact-form struct-block"`. Background color is a `background_color` ChoiceBlock whose values are theme classes: `""` for white, then `m24-t-dark`, `m24-t-green`, `m24-t-orange`, `m24-t-pink` and `m24-t-gray`.
+* Block templates wrap the component in an outer element that carries the background class, then a `<div class="m24-c-content">` container (see `prose_block.html`).
+* Headings follow `block_level` (`{% set heading_level = block_level if block_level else 2 %}`). Each page has exactly one `<h1>`, and every block after it starts at `<h2>`; see `freeform.html` for a page that promotes its first block's heading or falls back to a visually hidden `<h1>`.
+* Freeform page StreamField block names end in `_block`.
+* Class prefixes: `m24-c-` for components, `m24-l-` for layout variants, `m24-t-` for theme and size modifiers and `m24-u-` for utilities (e.g. `m24-u-lede`).
+* Use the `$m24-color-*` variables, not the `$token-color-*` values. `.m24-t-dark` uses the `invert-colors` mixin, so colors written in light-theme terms flip without being redeclared for dark sections. An element with its own dark background can `@include invert-colors` so links and text inside it adapt.
+* Grid helpers live in `vars/_grid.scss`: `grid($n)` only works inside a full-width container that has the container padding, `page-grid($n)` gives n columns of the page grid inside a full-width parent with no padding (e.g. `.m24-c-article`), and `sub-grid($n, $context)` gives n columns inside a context-column parent. Check the rendered widths in a browser, because nesting these changes what the percentages resolve against.
+* Limit body text width with `$text-body-max-cols` (in `vars/_text.scss`) rather than a literal column count.
+* Use the spacing tokens for vertical rhythm: `--section-spacing` between unconnected sections, `--group-spacing` to separate groups of related elements within a section, and `--item-spacing` between related elements. For example, the heading and subheading in an intro are separated by item spacing, the intro is separated from a group of tiles by group spacing, and the tiles inside that group are separated by item spacing.
+* Build intros with the `m24_intro` macro in `macros-m24.html`, placed inside the background wrapper and `.m24-c-content`. Its `tag` defaults to `header`, for an intro that introduces the content after it; pass `tag="div"` for an intro that stands alone, as the intro block does.
+* Blocks with a heading size setting share `HEADING_SIZE_CHOICES`.
+* Rich text fields share feature lists from `common.py`: `RICHTEXT_BODY_FEATURES` for bodies that sit under a block's own heading field, and `ARTICLE_RICHTEXT_FEATURES` (`h2` and `h3` plus the body set) for article text.
+* Wrap rendered rich text in `.m24-c-rich-text` to get the editor typography in `rich-text.scss`.
+* Use logical properties (`border-inline-start`, `inset-inline-start`, `padding-inline-start`), because bedrock serves right-to-left locales.
+* The browser support matrix is Safari 15.6+ and Firefox 115+. Check caniuse before using newer CSS.
+* Keep the `sizes` value on `srcset_image` in step with the image's CSS widths, and re-check it whenever the layout changes.
+* Image and mask URLs in m24 SCSS are absolute `/media/...` paths, because `STATIC_URL` is `/media/`.
+* Wagtail serializes block definitions, including features, choices, `help_text` and `template`, into migrations, so changing any of them needs `makemigrations`.
+* Don't keep lists of things in comments; they go out of date.
 
 ## LLM assistance
 
